@@ -6,7 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint . --fix",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "db:migrate": "echo 'Run migrations here'",
+    "db:seed": "echo 'Seed database here'",
+    "contracts:deploy": "cd contracts && hardhat deploy",
+    "contracts:test": "cd contracts && hardhat test",
+    "netlify:functions": "netlify functions:serve",
+    "analyze": "ANALYZE=true next build",
+    "precommit": "lint-staged"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
