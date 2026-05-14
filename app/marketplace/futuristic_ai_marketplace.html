@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --neon-cyan:#00f5ff;--neon-purple:#b44dff;--neon-pink:#ff2d78;--neon-green:#39ff14;
+  --dark:#020812;--dark2:#060e1f;--dark3:#0a1628;--glass:rgba(255,255,255,0.04);
+  --glass2:rgba(255,255,255,0.08);--border:rgba(0,245,255,0.15);--border2:rgba(180,77,255,0.2);
+}
+body{background:var(--dark);color:#e8f4ff;font-family:'Syne',sans-serif;overflow-x:hidden;min-height:100vh}
+canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.wrapper{position:relative;z-index:1}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 2rem;border-bottom:1px solid var(--border);backdrop-filter:blur(20px);background:rgba(2,8,18,0.7);position:sticky;top:0;z-index:100}
+.logo{font-size:1.4rem;font-weight:800;letter-spacing:-0.02em}
+.logo span{background:linear-gradient(90deg,var(--neon-cyan),var(--neon-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:2rem;font-size:0.85rem;letter-spacing:0.08em;opacity:0.6}
+.nav-links a{color:inherit;text-decoration:none;transition:opacity 0.2s}
+.nav-links a:hover{opacity:1;color:var(--neon-cyan)}
+.nav-btn{background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));border:none;color:#000;padding:0.5rem 1.2rem;border-radius:6px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.8rem;letter-spacing:0.08em;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s}
+.nav-btn:hover{transform:scale(1.04);box-shadow:0 0 20px rgba(0,245,255,0.4)}
+
+/* HERO */
+.hero{padding:5rem 2rem 3rem;text-align:center;position:relative}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:0.5rem;background:var(--glass);border:1px solid var(--border);border-radius:100px;padding:0.35rem 1rem;font-family:'Space Mono',monospace;font-size:0.7rem;letter-spacing:0.12em;color:var(--neon-cyan);margin-bottom:1.8rem}
+.hero-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--neon-green);box-shadow:0 0 8px var(--neon-green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+h1{font-size:clamp(2.5rem,5vw,4.5rem);font-weight:800;line-height:1.05;letter-spacing:-0.03em;margin-bottom:1rem}
+.grad{background:linear-gradient(135deg,#fff 30%,var(--neon-cyan) 60%,var(--neon-purple) 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:1.05rem;color:rgba(200,220,255,0.55);max-width:560px;margin:0 auto 2.5rem;line-height:1.7}
+
+/* SEARCH */
+.search-wrap{max-width:620px;margin:0 auto 1.5rem;position:relative}
+.search-input{width:100%;background:var(--glass2);border:1px solid var(--border);border-radius:12px;padding:1rem 3.5rem 1rem 3rem;color:#fff;font-family:'Syne',sans-serif;font-size:1rem;outline:none;transition:border 0.3s,box-shadow 0.3s;backdrop-filter:blur(10px)}
+.search-input::placeholder{color:rgba(200,220,255,0.35)}
+.search-input:focus{border-color:var(--neon-cyan);box-shadow:0 0 0 1px var(--neon-cyan),0 0 30px rgba(0,245,255,0.12)}
+.search-icon{position:absolute;left:1rem;top:50%;transform:translateY(-50%);opacity:0.4;font-size:1rem}
+.clear-btn{position:absolute;right:1rem;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(200,220,255,0.4);cursor:pointer;font-size:1.1rem;padding:0.2rem;transition:color 0.2s}
+.clear-btn:hover{color:var(--neon-pink)}
+
+/* STATS */
+.stats{display:flex;justify-content:center;gap:3rem;margin-bottom:3.5rem;flex-wrap:wrap}
+.stat-item{text-align:center}
+.stat-num{font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-label{font-size:0.7rem;letter-spacing:0.1em;opacity:0.45;margin-top:0.2rem}
+
+/* FILTERS */
+.filters{max-width:1200px;margin:0 auto;padding:0 2rem 1.5rem;display:flex;flex-wrap:wrap;gap:0.75rem;align-items:center;justify-content:space-between}
+.filter-pills{display:flex;flex-wrap:wrap;gap:0.5rem}
+.pill{background:var(--glass);border:1px solid var(--border);border-radius:100px;padding:0.4rem 1rem;font-size:0.78rem;letter-spacing:0.05em;cursor:pointer;transition:all 0.2s;color:rgba(200,220,255,0.6)}
+.pill:hover,.pill.active{background:rgba(0,245,255,0.1);border-color:var(--neon-cyan);color:var(--neon-cyan)}
+.sort-wrap{display:flex;align-items:center;gap:0.75rem}
+.sort-select{background:var(--glass2);border:1px solid var(--border);border-radius:8px;padding:0.4rem 0.8rem;color:rgba(200,220,255,0.7);font-family:'Syne',sans-serif;font-size:0.78rem;cursor:pointer;outline:none}
+.sort-select option{background:#060e1f}
+.results-count{font-family:'Space Mono',monospace;font-size:0.72rem;color:rgba(200,220,255,0.4);letter-spacing:0.05em}
+
+/* GRID */
+.grid{max-width:1200px;margin:0 auto;padding:0 2rem 5rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.5rem}
+
+/* MODEL CARD */
+.model-card{background:var(--dark2);border:1px solid rgba(255,255,255,0.07);border-radius:16px;overflow:hidden;cursor:pointer;transition:transform 0.3s cubic-bezier(0.16,1,0.3,1),box-shadow 0.3s,border-color 0.3s;position:relative;group:hover}
+.model-card::before{content:'';position:absolute;inset:0;border-radius:16px;padding:1px;background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple),var(--neon-pink));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:destination-out;mask-composite:exclude;opacity:0;transition:opacity 0.35s;pointer-events:none}
+.model-card:hover::before{opacity:1}
+.model-card:hover{transform:translateY(-6px) scale(1.01);box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 40px rgba(0,245,255,0.08)}
+
+/* CARD IMAGE */
+.card-img{width:100%;height:180px;position:relative;overflow:hidden}
+.card-img-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:5rem;position:relative}
+.card-img-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,var(--dark2));z-index:1}
+.card-badges{position:absolute;top:0.75rem;left:0.75rem;display:flex;gap:0.4rem;z-index:2;flex-wrap:wrap}
+.badge{font-size:0.65rem;font-weight:700;letter-spacing:0.08em;padding:0.25rem 0.6rem;border-radius:100px;font-family:'Space Mono',monospace}
+.badge-trending{background:rgba(255,45,120,0.2);color:var(--neon-pink);border:1px solid rgba(255,45,120,0.4)}
+.badge-free{background:rgba(57,255,20,0.15);color:var(--neon-green);border:1px solid rgba(57,255,20,0.3)}
+.badge-paid{background:rgba(180,77,255,0.15);color:var(--neon-purple);border:1px solid rgba(180,77,255,0.3)}
+.badge-new{background:rgba(0,245,255,0.12);color:var(--neon-cyan);border:1px solid rgba(0,245,255,0.3)}
+
+/* CARD BODY */
+.card-body{padding:1.2rem}
+.card-category{font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.12em;color:var(--neon-cyan);opacity:0.7;margin-bottom:0.4rem;text-transform:uppercase}
+.card-name{font-size:1.1rem;font-weight:700;margin-bottom:0.4rem;line-height:1.2;letter-spacing:-0.01em}
+.card-desc{font-size:0.8rem;color:rgba(200,220,255,0.5);line-height:1.55;margin-bottom:1rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-tags{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem}
+.tag{font-size:0.65rem;padding:0.2rem 0.5rem;border-radius:4px;background:rgba(255,255,255,0.05);color:rgba(200,220,255,0.5);border:1px solid rgba(255,255,255,0.07)}
+.card-footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.06);padding-top:0.85rem}
+.card-price{font-weight:700;font-size:0.95rem}
+.price-free{color:var(--neon-green)}
+.price-paid{color:var(--neon-cyan)}
+.card-meta{display:flex;align-items:center;gap:1rem}
+.meta-item{display:flex;align-items:center;gap:0.3rem;font-size:0.72rem;color:rgba(200,220,255,0.4);font-family:'Space Mono',monospace}
+.star{color:#f59e0b}
+
+/* EMPTY */
+.empty{text-align:center;padding:5rem 2rem;color:rgba(200,220,255,0.4)}
+.empty-icon{font-size:4rem;margin-bottom:1rem;opacity:0.3}
+.empty h3{font-size:1.3rem;margin-bottom:0.5rem;color:rgba(200,220,255,0.7)}
+.empty button{margin-top:1.5rem;background:var(--glass2);border:1px solid var(--border);color:var(--neon-cyan);padding:0.6rem 1.5rem;border-radius:8px;font-family:'Syne',sans-serif;font-size:0.85rem;cursor:pointer;transition:all 0.2s}
+.empty button:hover{background:rgba(0,245,255,0.1)}
+
+/* GRID BG PATTERNS */
+.card-bg-1{background:linear-gradient(135deg,#0d1a3e,#1a0d3e)}
+.card-bg-2{background:linear-gradient(135deg,#0d2a1f,#002014)}
+.card-bg-3{background:linear-gradient(135deg,#2a0d1a,#3e001a)}
+.card-bg-4{background:linear-gradient(135deg,#1a1a0d,#2a200d)}
+.card-bg-5{background:linear-gradient(135deg,#0a0d2a,#0d2040)}
+.card-bg-6{background:linear-gradient(135deg,#1f0d2a,#2a0a1a)}
+.card-bg-7{background:linear-gradient(135deg,#002a2a,#0d1f1f)}
+.card-bg-8{background:linear-gradient(135deg,#2a0d0d,#3e1a0d)}
+
+.glow-ring{position:absolute;border-radius:50%;filter:blur(30px);animation:floatGlow 4s ease-in-out infinite alternate}
+
+@keyframes floatGlow{0%{transform:scale(1) translate(0,0);opacity:0.6}100%{transform:scale(1.2) translate(5px,-5px);opacity:0.9}}
+
+.shimmer{background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.04) 50%,transparent 100%);background-size:200% 100%;animation:shimmer 2.5s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+.animate-in{animation:fadeUp 0.5s ease-out both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* SCANLINE */
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,245,255,0.012) 2px,rgba(0,245,255,0.012) 4px);pointer-events:none;z-index:9999}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="wrapper">
+
+<nav>
+  <div class="logo"><span>NEXUS</span>.AI</div>
+  <div class="nav-links">
+    <a href="#">Explore</a>
+    <a href="#">Deploy</a>
+    <a href="#">Earn</a>
+    <a href="#">Docs</a>
+  </div>
+  <button class="nav-btn">LAUNCH APP</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">⬡ LIVE MARKETPLACE · 847 MODELS</div>
+  <h1><span class="grad">AI Model<br>Marketplace</span></h1>
+  <p>Discover, deploy, and monetize cutting-edge AI models from creators worldwide. The future of intelligence is open.</p>
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input class="search-input" id="searchInput" type="text" placeholder="Search models, creators, capabilities...">
+    <button class="clear-btn" id="clearBtn" style="display:none">✕</button>
+  </div>
+  <div class="stats">
+    <div class="stat-item"><div class="stat-num">847</div><div class="stat-label">MODELS</div></div>
+    <div class="stat-item"><div class="stat-num">12K+</div><div class="stat-label">CREATORS</div></div>
+    <div class="stat-item"><div class="stat-num">4.2M</div><div class="stat-label">API CALLS</div></div>
+    <div class="stat-item"><div class="stat-num">99.9%</div><div class="stat-label">UPTIME</div></div>
+  </div>
+</div>
+
+<div class="filters" id="filterBar">
+  <div class="filter-pills" id="pills">
+    <div class="pill active" data-cat="all">ALL</div>
+    <div class="pill" data-cat="text">TEXT GEN</div>
+    <div class="pill" data-cat="image">IMAGE GEN</div>
+    <div class="pill" data-cat="code">CODE</div>
+    <div class="pill" data-cat="audio">AUDIO</div>
+    <div class="pill" data-cat="video">VIDEO</div>
+    <div class="pill" data-cat="multimodal">MULTIMODAL</div>
+    <div class="pill" data-cat="embedding">EMBEDDING</div>
+  </div>
+  <div class="sort-wrap">
+    <span class="results-count" id="resultsCount">12 models</span>
+    <select class="sort-select" id="sortSelect">
+      <option value="trending">🔥 Trending</option>
+      <option value="rating">⭐ Top Rated</option>
+      <option value="newest">🆕 Newest</option>
+      <option value="price-low">💲 Price: Low</option>
+      <option value="price-high">💲 Price: High</option>
+    </select>
+  </div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+</div>
+
+<script>
+const models=[
+  {id:1,name:"NeuralScribe Pro",cat:"text",desc:"State-of-the-art language model with 70B parameters. Produces cinematic, nuanced prose with unprecedented coherence.",emoji:"✦",bg:"card-bg-1",tags:["GPT-4 class","long context","reasoning"],price:0,rating:4.9,calls:"2.1M",trending:true,isNew:false,date:"2024-10-01"},
+  {id:2,name:"VisionForge X",cat:"image",desc:"Photorealistic image synthesis powered by latent diffusion. Generates 8K cinematics from text in seconds.",emoji:"◈",bg:"card-bg-3",tags:["8K output","cinematic","ControlNet"],price:29,rating:4.8,calls:"890K",trending:true,isNew:false,date:"2024-11-01"},
+  {id:3,name:"CodeMind Ultra",cat:"code",desc:"Elite code synthesis AI trained on 50M+ repositories. Write, debug, and optimize across 80+ languages.",emoji:"⎇",bg:"card-bg-5",tags:["80+ langs","debugging","autocomplete"],price:0,rating:4.7,calls:"1.4M",trending:false,isNew:false,date:"2024-09-01"},
+  {id:4,name:"SonicWave Gen",cat:"audio",desc:"Next-gen audio synthesis. Generates studio-quality music, voice, SFX, and spatial audio from prompts.",emoji:"◎",bg:"card-bg-4",tags:["studio quality","voice clone","spatial audio"],price:19,rating:4.6,calls:"340K",trending:false,isNew:true,date:"2024-12-01"},
+  {id:5,name:"OmniMind 3.5",cat:"multimodal",desc:"Unified vision-language-audio model. Understands images, audio, video, and text simultaneously with chain-of-thought reasoning.",emoji:"⬡",bg:"card-bg-6",tags:["all modalities","chain-of-thought","real-time"],price:49,rating:4.9,calls:"670K",trending:true,isNew:true,date:"2024-12-15"},
+  {id:6,name:"CinematicDream",cat:"video",desc:"Transform text into breathtaking 4K video sequences. Temporal consistency engine ensures fluid, realistic motion.",emoji:"▣",bg:"card-bg-2",tags:["4K video","60fps","text-to-video"],price:79,rating:4.7,calls:"120K",trending:false,isNew:true,date:"2024-12-10"},
+  {id:7,name:"EmbedCore v4",cat:"embedding",desc:"High-dimensional semantic embeddings. 4096-dim vectors with SOTA retrieval on BEIR, MTEB, and custom benchmarks.",emoji:"∷",bg:"card-bg-7",tags:["4096-dim","RAG ready","MTEB #1"],price:0,rating:4.5,calls:"3.2M",trending:false,isNew:false,date:"2024-08-01"},
+  {id:8,name:"PixelSurgeon",cat:"image",desc:"AI-powered image editing with surgical precision. Inpaint, outpaint, remove objects, and relight scenes.",emoji:"◐",bg:"card-bg-3",tags:["inpainting","relighting","4K"],price:15,rating:4.6,calls:"560K",trending:false,isNew:false,date:"2024-10-15"},
+  {id:9,name:"Phi-Nano",cat:"text",desc:"Blazing fast 3B parameter model for edge deployment. 1000 tokens/sec on consumer hardware. Open weights.",emoji:"φ",bg:"card-bg-1",tags:["edge ready","open weights","fast"],price:0,rating:4.4,calls:"4.1M",trending:false,isNew:false,date:"2024-07-01"},
+  {id:10,name:"LogicCore X",cat:"code",desc:"Specialized reasoning model for algorithm design, system architecture, and competitive programming tasks.",emoji:"Λ",bg:"card-bg-5",tags:["algorithms","competitive","architecture"],price:39,rating:4.8,calls:"280K",trending:true,isNew:true,date:"2024-12-20"},
+  {id:11,name:"NovaSynth",cat:"audio",desc:"Real-time voice synthesis with emotional intelligence. Clone any voice in 3 seconds. 50+ languages supported.",emoji:"≋",bg:"card-bg-4",tags:["voice clone","emotion","50 langs"],price:25,rating:4.5,calls:"410K",trending:false,isNew:false,date:"2024-09-15"},
+  {id:12,name:"MegaVerse VL",cat:"multimodal",desc:"Document understanding at scale. Parse PDFs, charts, diagrams, and handwriting with superhuman accuracy.",emoji:"⟐",bg:"card-bg-6",tags:["document AI","OCR","charts"],price:0,rating:4.6,calls:"1.8M",trending:false,isNew:false,date:"2024-11-15"},
+];
+
+let activeCategory="all",activeSort="trending",searchQuery="";
+
+function getFiltered(){
+  let r=[...models];
+  if(activeCategory!=="all") r=r.filter(m=>m.cat===activeCategory);
+  if(searchQuery) r=r.filter(m=>m.name.toLowerCase().includes(searchQuery)||m.desc.toLowerCase().includes(searchQuery)||m.tags.some(t=>t.toLowerCase().includes(searchQuery)));
+  r.sort((a,b)=>{
+    if(activeSort==="trending") return (b.trending?1:0)-(a.trending?1:0);
+    if(activeSort==="rating") return b.rating-a.rating;
+    if(activeSort==="newest") return new Date(b.date)-new Date(a.date);
+    if(activeSort==="price-low") return a.price-b.price;
+    if(activeSort==="price-high") return b.price-a.price;
+    return 0;
+  });
+  return r;
+}
+
+function render(){
+  const models=getFiltered();
+  const grid=document.getElementById("grid");
+  document.getElementById("resultsCount").textContent=models.length+" models";
+  if(!models.length){
+    grid.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="empty-icon">⌀</div><h3>No models found</h3><p>Try adjusting your search or filters.</p><button onclick="clearAll()">Clear all filters</button></div>`;
+    return;
+  }
+  grid.innerHTML=models.map((m,i)=>`
+    <div class="model-card animate-in" style="animation-delay:${i*0.06}s">
+      <div class="card-img ${m.bg}">
+        <div class="glow-ring" style="width:120px;height:120px;background:${m.trending?'rgba(0,245,255,0.25)':'rgba(180,77,255,0.2)'};top:-20px;left:-20px"></div>
+        <div class="glow-ring" style="width:80px;height:80px;background:${m.isNew?'rgba(255,45,120,0.2)':'rgba(0,200,255,0.15)'};bottom:-10px;right:20px;animation-delay:1s"></div>
+        <div class="card-img-inner">${m.emoji}</div>
+        <div class="card-img-overlay"></div>
+        <div class="card-badges">
+          ${m.trending?'<span class="badge badge-trending">🔥 TRENDING</span>':''}
+          ${m.isNew?'<span class="badge badge-new">✦ NEW</span>':''}
+          ${m.price===0?'<span class="badge badge-free">FREE</span>':'<span class="badge badge-paid">$'+m.price+'/mo</span>'}
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-category">${m.cat.toUpperCase()}</div>
+        <div class="card-name">${m.name}</div>
+        <div class="card-desc">${m.desc}</div>
+        <div class="card-tags">${m.tags.map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+        <div class="card-footer">
+          <div class="card-price ${m.price===0?'price-free':'price-paid'}">${m.price===0?'FREE':'$'+m.price+'/mo'}</div>
+          <div class="card-meta">
+            <div class="meta-item"><span class="star">★</span>${m.rating}</div>
+            <div class="meta-item">⬆ ${m.calls}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function clearAll(){activeCategory="all";activeSort="trending";searchQuery="";document.getElementById("searchInput").value="";document.getElementById("clearBtn").style.display="none";document.querySelectorAll(".pill").forEach(p=>{p.classList.toggle("active",p.dataset.cat==="all")});document.getElementById("sortSelect").value="trending";render()}
+
+document.getElementById("searchInput").addEventListener("input",function(){searchQuery=this.value.toLowerCase().trim();document.getElementById("clearBtn").style.display=searchQuery?"block":"none";render()});
+document.getElementById("clearBtn").addEventListener("click",function(){document.getElementById("searchInput").value="";searchQuery="";this.style.display="none";render()});
+document.getElementById("sortSelect").addEventListener("change",function(){activeSort=this.value;render()});
+document.querySelectorAll(".pill").forEach(pill=>{
+  pill.addEventListener("click",function(){
+    document.querySelectorAll(".pill").forEach(p=>p.classList.remove("active"));
+    this.classList.add("active");
+    activeCategory=this.dataset.cat;
+    render();
+  });
+});
+
+// CANVAS PARTICLE BACKGROUND
+const canvas=document.getElementById("bg"),ctx=canvas.getContext("2d");
+let W,H,particles=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}
+resize();window.addEventListener("resize",resize);
+class Particle{
+  constructor(){this.reset()}
+  reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.r=Math.random()*1.5+0.3;this.vx=(Math.random()-0.5)*0.4;this.vy=(Math.random()-0.5)*0.4;this.alpha=Math.random()*0.5+0.1;this.color=Math.random()>0.6?`rgba(0,245,255,${this.alpha})`:`rgba(180,77,255,${this.alpha})`}
+  update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset()}
+  draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=this.color;ctx.fill()}
+}
+for(let i=0;i<120;i++) particles.push(new Particle());
+
+function drawGrid(){
+  ctx.strokeStyle="rgba(0,245,255,0.03)";ctx.lineWidth=1;
+  const s=60;
+  for(let x=0;x<W;x+=s){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+  for(let y=0;y<H;y+=s){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+}
+
+function connect(){
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<100){ctx.strokeStyle=`rgba(0,245,255,${0.06*(1-d/100)})`;ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.stroke()}
+    }
+  }
+}
+
+function animate(){
+  ctx.fillStyle="rgba(2,8,18,0.85)";ctx.fillRect(0,0,W,H);
+  drawGrid();
+  particles.forEach(p=>{p.update();p.draw()});
+  connect();
+  requestAnimationFrame(animate);
+}
+animate();
+render();
+</script>
+</body>
+</html>
