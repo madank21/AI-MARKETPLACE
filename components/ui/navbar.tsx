@@ -34,7 +34,7 @@ import {
 const navItems = [
   { href: '/marketplace', label: 'Marketplace', icon: Store },
   { href: '/explore', label: 'Explore', icon: Search },
-  { href: '/creators', label: 'Creators', icon: Users },
+  { href: '/creator/upload', label: 'Creators', icon: Users },
   { href: '/docs', label: 'Docs', icon: BookOpen },
 ]
 
