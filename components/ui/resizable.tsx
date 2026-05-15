@@ -10,7 +10,7 @@ function ResizablePanelGroup({
   className,
   ...props
 }: React.ComponentProps<typeof ResizablePrimitive.PanelGroup>) {
-  return (
+  return ( 
     <ResizablePrimitive.PanelGroup
       data-slot="resizable-panel-group"
       className={cn(
