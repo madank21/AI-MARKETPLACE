@@ -1,9 +1,13 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
 import { GradientText } from '@/components/ui/gradient-text'
 import { GlowButton } from '@/components/ui/glow-card'
-import { Scene3D } from '@/components/ui/scene-3d'
+const Scene3D = dynamic(
+  () => import('@/components/ui/scene-3d.client').then((mod) => mod.Scene3D),
+  { ssr: false }
+)
 import { ParticleField } from '@/components/ui/particle-field'
 import { AnimatedContainer, FloatingElement } from '@/components/ui/animated'
 import { ArrowRight, Play, Sparkles, Shield, Zap, Globe } from 'lucide-react'

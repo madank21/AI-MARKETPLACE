@@ -1,9 +1,13 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { GlowCard } from '@/components/ui/glow-card'
 import { GradientText } from '@/components/ui/gradient-text'
 import { AnimatedContainer, StaggerContainer, StaggerItem } from '@/components/ui/animated'
-import { FloatingCubesScene } from '@/components/ui/scene-3d'
+const FloatingCubesScene = dynamic(
+  () => import('@/components/ui/scene-3d.client').then((mod) => mod.FloatingCubesScene),
+  { ssr: false }
+)
 import { 
   Upload, 
   Code2, 
