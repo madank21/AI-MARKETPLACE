@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { mockModels } from '@/lib/mock-data'
 import { StaggerContainer, StaggerItem } from '@/components/ui/animated'
 import { cn } from '@/lib/utils'
+import { RobohashAvatar } from '@/components/ui/robohash-avatar'
 
 // COMPLETE 12+ MODELS with REAL IMAGE PREVIEWS
 const models = [
@@ -56,12 +57,15 @@ function ModelCard({ model }: { model: typeof models[0] }) {
         <div className="space-y-4 flex-1">
           <h3 className="font-bold text-xl line-clamp-2 group-hover:text-primary transition-colors">{model.name}</h3>
           
-          <div className="flex items-center gap-3 text-sm text-muted-foreground">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary/20 rounded-full flex items-center justify-center font-bold text-primary">
-              {model.creator.charAt(0)}
-            </div>
-            <span className="font-semibold truncate">{model.creator}</span>
-          </div>
+          // app/explore/page.tsx - In ModelCard, replace creator section:
+<div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
+  <RobohashAvatar 
+    name={model.creator} 
+    size={40} 
+    className="ring-2 ring-white/30 shadow-lg" 
+  />
+  <span className="font-semibold truncate">{model.creator}</span>
+</div>
 
           {/* Tags */}
           <div className="flex flex-wrap gap-1.5">

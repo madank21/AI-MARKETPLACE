@@ -429,3 +429,10 @@ export const mockModels1 = [
     id: '12', name: 'Poetry Master', creator: 'Emma Wilson', rating: 4.78, downloads: 7650, price: 15, category: 'Text Gen', verified: false, trending: false, tags: ['Poetry', 'Creative', 'Rhyme'], preview: '/api/placeholder/400/300'
   }
 ]
+// lib/mock-data.ts - Your existing creators work perfectly!
+export const mockCreators1 = [
+  { id: '1', name: 'Alex Chen', rating: 4.9, followers: 12450, totalModels: 23, totalEarnings: '$45.2K', verified: true },
+  { id: '2', name: 'Sarah Kim', rating: 4.8, followers: 8920, totalModels: 15, totalEarnings: '$28.9K', verified: true },
+  { id: '3', name: 'Jamie Ruiz', rating: 4.95, followers: 21500, totalModels: 34, totalEarnings: '$67.1K', verified: true },
+  // ... Robohash generates unique robot for each name automatically!
+]

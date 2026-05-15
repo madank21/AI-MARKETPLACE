@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Button } from './button'
 import { GradientText } from './gradient-text'
+import { RobohashAvatar } from '@/components/ui/robohash-avatar' // 👈 ADDED
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -56,50 +57,49 @@ export function Navbar() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         className={cn(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-          isScrolled
-            ? 'bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-lg shadow-primary/5'
-            : 'bg-transparent'
+          'fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-lg shadow-primary/5',
+          isScrolled && 'shadow-xl shadow-primary/10'
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center overflow-hidden">
-                <Sparkles className="w-5 h-5 text-white relative z-10" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+            <Link href="/" className="flex items-center gap-3 group p-1 rounded-xl hover:bg-muted/50 transition-all">
+              <div className="relative w-11 h-11 rounded-2xl bg-gradient-to-br from-primary via-purple-500 to-secondary shadow-xl overflow-hidden group-hover:scale-110 transition-all">
+                <Sparkles className="w-6 h-6 text-white relative z-10 drop-shadow-lg" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent animate-pulse opacity-70" />
               </div>
-              <span className="font-bold text-xl hidden sm:block">
-                <GradientText variant="blue-cyan">NexusAI</GradientText>
-              </span>
+              <GradientText variant="blue-cyan" className="font-black text-xl hidden sm:block tracking-tight">
+                NexusAI
+              </GradientText>
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-1">
+            <nav className="hidden lg:flex items-center gap-2">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+                    'px-4 py-2.5 rounded-xl text-sm font-semibold relative group transition-all duration-300 hover:shadow-md',
                     pathname === item.href
-                      ? 'bg-primary/10 text-primary'
+                      ? 'bg-gradient-to-r from-primary/20 to-secondary/20 text-primary shadow-lg shadow-primary/20'
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                   )}
                 >
+                  <item.icon className="w-4 h-4 mr-1.5 inline group-hover:rotate-12 transition-transform" />
                   {item.label}
                 </Link>
               ))}
             </nav>
 
             {/* Right Side */}
-            <div className="flex items-center gap-3">
-              {/* Search Button */}
+            <div className="flex items-center gap-2 lg:gap-3">
+              {/* Search */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="hidden sm:flex text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground hover:bg-muted/50 w-11 h-11"
               >
                 <Search className="w-5 h-5" />
               </Button>
@@ -108,13 +108,20 @@ export function Navbar() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="hidden sm:flex text-muted-foreground hover:text-foreground relative"
+                className="relative text-muted-foreground hover:text-foreground hover:bg-muted/50 w-11 h-11"
               >
                 <Bell className="w-5 h-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
+                <motion.span 
+                  className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-red-500 to-pink-500 text-xs rounded-full flex items-center justify-center text-white font-bold shadow-lg border-2 border-background"
+                  layoutId="notification"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                >
+                  3
+                </motion.span>
               </Button>
 
-              {/* Connect Wallet */}
+              {/* Connect Wallet / User Profile 👇 ROBOHASH HERE */}
               <div className="hidden sm:block">
                 <ConnectButton.Custom>
                   {({
@@ -142,12 +149,14 @@ export function Navbar() {
                         {(() => {
                           if (!connected) {
                             return (
-                              <Button
-                                onClick={openConnectModal}
-                                className="bg-gradient-to-r from-primary to-secondary hover:opacity-90"
-                              >
-                                Connect Wallet
-                              </Button>
+                              <motion.div whileHover={{ scale: 1.02 }}>
+                                <Button
+                                  onClick={openConnectModal}
+                                  className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-sm font-bold shadow-lg hover:shadow-primary/25 px-6 h-11"
+                                >
+                                  Connect
+                                </Button>
+                              </motion.div>
                             )
                           }
 
@@ -156,54 +165,117 @@ export function Navbar() {
                               <Button
                                 onClick={openChainModal}
                                 variant="destructive"
+                                className="shadow-lg h-11"
                               >
-                                Wrong network
+                                Wrong Network
                               </Button>
                             )
                           }
 
+                          // 👇 ROBOHASH AVATAR FOR CONNECTED USER
                           return (
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="gap-2">
-                                  <div className="w-2 h-2 rounded-full bg-green-500" />
-                                  {account.displayName}
-                                  <ChevronDown className="w-4 h-4" />
-                                </Button>
+                                <motion.div 
+                                  className="flex items-center gap-3 p-2.5 rounded-2xl hover:bg-muted/50 cursor-pointer transition-all group backdrop-blur-sm border border-border/50 hover:border-primary/50 hover:shadow-lg"
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                >
+                                  {/* ROBOT AVATAR 👇 */}
+                                  <RobohashAvatar 
+                                    name={account.displayName} 
+                                    size={44}
+                                    className="ring-2 ring-white/50 shadow-md group-hover:ring-primary/60 transition-all duration-300" 
+                                  />
+                                  
+                                  {/* User Info */}
+                                  <div className="hidden lg:block min-w-0">
+                                    <p className="font-bold text-sm truncate max-w-[140px]">{account.displayName}</p>
+                                    <p className="text-xs text-muted-foreground truncate max-w-[140px]">
+                                      {chain.name}
+                                    </p>
+                                  </div>
+                                  
+                                  <motion.div 
+                                    className="w-2 h-2 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full ml-1.5"
+                                    layoutId="status-dot"
+                                    animate={{ scale: [1, 1.2, 1] }}
+                                    transition={{ repeat: Infinity, duration: 2 }}
+                                  />
+                                  <ChevronDown className="w-4 h-4 ml-1 text-muted-foreground group-hover:rotate-180 transition-transform duration-300" />
+                                </motion.div>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="w-56">
-                                <DropdownMenuItem onClick={openChainModal}>
-                                  <div className="flex items-center gap-2">
+                              
+                              {/* Enhanced Dropdown 👇 */}
+                              <DropdownMenuContent 
+                                align="end" 
+                                className="w-80 p-3 backdrop-blur-xl border border-white/10 shadow-2xl shadow-primary/20 mr-2 rounded-2xl"
+                              >
+                                {/* Profile Header with Large Avatar */}
+                                <motion.div 
+                                  initial={{ opacity: 0, scale: 0.95 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  className="p-5 border-b border-border/30 rounded-2xl mb-3 bg-gradient-to-br from-muted/30 to-transparent"
+                                >
+                                  <div className="flex items-center gap-4">
+                                    <RobohashAvatar 
+                                      name={account.displayName} 
+                                      size={56}
+                                      className="shadow-xl ring-4 ring-white/40" 
+                                    />
+                                    <div className="min-w-0 flex-1">
+                                      <p className="font-black text-lg truncate">{account.displayName}</p>
+                                      <p className="text-sm text-muted-foreground truncate">{account.address.slice(0, 6)}...{account.address.slice(-4)}</p>
+                                      <div className="flex items-center gap-2 mt-1">
+                                        <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full" />
+                                        <span className="text-xs font-medium text-emerald-600">Online</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </motion.div>
+
+                                {/* Menu Items */}
+                                <DropdownMenuItem asChild className="rounded-xl cursor-pointer hover:bg-muted/50 p-3 mx-1 -my-1 w-full">
+                                  <Link href="/dashboard" className="flex items-center gap-3">
+                                    <LayoutDashboard className="w-5 h-5 text-primary shrink-0" />
+                                    <span>Dashboard</span>
+                                  </Link>
+                                </DropdownMenuItem>
+                                
+                                <DropdownMenuItem asChild className="rounded-xl cursor-pointer hover:bg-muted/50 p-3 mx-1 -my-1 w-full">
+                                  <Link href="/portfolio" className="flex items-center gap-3">
+                                    <Users className="w-5 h-5 text-secondary shrink-0" />
+                                    <span>Portfolio</span>
+                                  </Link>
+                                </DropdownMenuItem>
+                                
+                                <DropdownMenuItem asChild className="rounded-xl cursor-pointer hover:bg-muted/50 p-3 mx-1 -my-1 w-full">
+                                  <Link href="/creators" className="flex items-center gap-3">
+                                    <Users className="w-5 h-5 text-accent shrink-0" />
+                                    <span>Creators</span>
+                                  </Link>
+                                </DropdownMenuItem>
+                                
+                                <DropdownMenuSeparator className="my-2 bg-border/50 mx-1" />
+                                
+                                <DropdownMenuItem 
+                                  onClick={openChainModal}
+                                  className="rounded-xl cursor-pointer hover:bg-muted/50 p-3 mx-1 -my-1 text-muted-foreground"
+                                >
+                                  <div className="flex items-center gap-3">
                                     {chain.hasIcon && chain.iconUrl && (
-                                      <img
-                                        src={chain.iconUrl}
-                                        alt={chain.name ?? 'Chain'}
-                                        className="w-4 h-4 rounded-full"
-                                      />
+                                      <img src={chain.iconUrl} alt={chain.name} className="w-6 h-6 rounded-full" />
                                     )}
-                                    {chain.name}
+                                    <span>Switch Network</span>
                                   </div>
                                 </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem asChild>
-                                  <Link href="/dashboard">
-                                    <LayoutDashboard className="w-4 h-4 mr-2" />
-                                    Dashboard
-                                  </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem asChild>
-                                  <Link href="/settings">
-                                    <Settings className="w-4 h-4 mr-2" />
-                                    Settings
-                                  </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
+                                
+                                <DropdownMenuItem 
                                   onClick={openAccountModal}
-                                  className="text-destructive"
+                                  className="rounded-xl cursor-pointer hover:bg-destructive/10 p-3 mx-1 -my-1 text-destructive font-semibold"
                                 >
-                                  <LogOut className="w-4 h-4 mr-2" />
-                                  Disconnect
+                                  <LogOut className="w-5 h-5 mr-3" />
+                                  Disconnect Wallet
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -219,14 +291,10 @@ export function Navbar() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden"
+                className="lg:hidden p-1.5 hover:bg-muted/50 rounded-xl"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               >
-                {isMobileMenuOpen ? (
-                  <X className="w-5 h-5" />
-                ) : (
-                  <Menu className="w-5 h-5" />
-                )}
+                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </Button>
             </div>
           </div>
@@ -243,44 +311,47 @@ export function Navbar() {
             className="fixed inset-0 z-40 lg:hidden"
           >
             <div
-              className="absolute inset-0 bg-background/80 backdrop-blur-xl"
+              className="absolute inset-0 bg-background/95 backdrop-blur-2xl"
               onClick={() => setIsMobileMenuOpen(false)}
             />
             <motion.nav
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="relative mt-20 p-4 space-y-2"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="relative mt-20 p-6 rounded-3xl mx-4 bg-card/90 backdrop-blur-2xl shadow-2xl border border-border/50"
             >
-              {navItems.map((item, index) => (
+              <div className="space-y-4">
+                {navItems.map((item, index) => (
+                  <motion.div
+                    key={item.href}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Link
+                      href={item.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={cn(
+                        'flex items-center gap-4 p-4 rounded-2xl text-lg font-semibold transition-all group hover:shadow-xl',
+                        pathname === item.href
+                          ? 'bg-gradient-to-r from-primary/20 to-secondary/20 text-primary shadow-lg shadow-primary/20'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                      )}
+                    >
+                      <item.icon className="w-6 h-6 shrink-0 group-hover:rotate-12 transition-transform" />
+                      {item.label}
+                    </Link>
+                  </motion.div>
+                ))}
+                
                 <motion.div
-                  key={item.href}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: navItems.length * 0.1 }}
+                  className="pt-6 border-t border-border/50"
                 >
-                  <Link
-                    href={item.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 px-4 py-3 rounded-lg text-lg font-medium transition-all',
-                      pathname === item.href
-                        ? 'bg-primary/10 text-primary'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                    )}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    {item.label}
-                  </Link>
+                  <ConnectButton />
                 </motion.div>
-              ))}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: navItems.length * 0.1 }}
-                className="pt-4"
-              >
-                <ConnectButton />
-              </motion.div>
+              </div>
             </motion.nav>
           </motion.div>
         )}

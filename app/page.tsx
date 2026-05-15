@@ -23,5 +23,6 @@ export default function HomePage() {
       <CTASection />
       <Footer />
     </main>
+    
   )
 }
