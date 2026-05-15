@@ -6,9 +6,8 @@
 /* Futuristic AI Marketplace Design System */
 :root {
   /* Core Space Theme */
-  --background: oklch(0.08 0.02 270);
-  --foreground: oklch(0.98 0 0);
-  
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
   /* Cards with glassmorphism */
   --card: oklch(0.12 0.02 270);
   --card-foreground: oklch(0.98 0 0);
@@ -419,6 +418,41 @@
     opacity: 1;
     transform: scale(1);
   }
+}
+
+/* globals.css - ADD THESE CSS UTILITIES */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.shadow-glow {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 
+              0 0 0 1px rgba(255, 255, 255, 0.05), 
+              0 0 40px rgba(99, 102, 241, 0.2);
+}
+
+.shadow-glow-primary {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 
+              0 0 0 1px rgba(255, 255, 255, 0.05), 
+              0 0 60px rgba(99, 102, 241, 0.4);
+}
+
+/* Bonus: Better line-clamp for multiple lines */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* Ensure dark mode is always on */

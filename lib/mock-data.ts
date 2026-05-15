@@ -45,7 +45,7 @@ export interface ModelStats {
   downloads: number
 }
 
-export type ModelCategory = 
+export type ModelCategory =
   | 'text-generation'
   | 'image-generation'
   | 'code-generation'
@@ -340,4 +340,92 @@ export const computeProviders: ComputeProvider[] = [
   { id: 'cp-2', name: 'QuantumNodes', location: 'EU-West', gpuType: 'A100', gpuCount: 4, pricePerHour: 0.015, availability: 95, latency: 25, rating: 4.7 },
   { id: 'cp-3', name: 'DecentraGPU', location: 'Asia-Pacific', gpuType: 'H100', gpuCount: 16, pricePerHour: 0.025, availability: 99, latency: 45, rating: 4.85 },
   { id: 'cp-4', name: 'NodeMatrix', location: 'US-West', gpuType: 'A100', gpuCount: 8, pricePerHour: 0.018, availability: 97, latency: 18, rating: 4.8 },
+]
+
+// Add this to your existing mock-data.ts
+export const mockModels1 = [
+  {
+    id: '1',
+    name: 'Nova AI Pro',
+    creator: 'Alex Chen',
+    rating: 4.9,
+    downloads: 12450,
+    price: 29,
+    category: 'Image Gen',
+    verified: true,
+    trending: true,
+    tags: ['Stable Diffusion', 'High Fidelity', 'Commercial']
+  },
+  {
+    id: '2',
+    name: 'Quantum Code',
+    creator: 'Sarah Kim',
+    rating: 4.8,
+    downloads: 8920,
+    price: 0,
+    category: 'Code Gen',
+    verified: true,
+    trending: false,
+    tags: ['GPT-4', 'Code Completion', 'TypeScript']
+  },
+  {
+    id: '3',
+    name: 'PixelForge XL',
+    creator: 'Jamie Ruiz',
+    rating: 4.95,
+    downloads: 21500,
+    price: 49,
+    category: 'Image Gen',
+    verified: true,
+    trending: true,
+    tags: ['Midjourney', '4K', 'Artistic']
+  },
+  {
+    id: '4',
+    name: 'SynthText Pro',
+    creator: 'Elena Voss',
+    rating: 4.7,
+    downloads: 6730,
+    price: 19,
+    category: 'Text Gen',
+    verified: false,
+    trending: false,
+    tags: ['Llama 2', 'Creative', 'Longform']
+  },
+  {
+    id: '1', name: 'Nova AI Pro', creator: 'Alex Chen', rating: 4.9, downloads: 12450, price: 29, category: 'Image Gen', verified: true, trending: true, tags: ['Stable Diffusion', 'High Fidelity', 'Commercial'], preview: '/api/placeholder/400/300'
+  },
+  {
+    id: '2', name: 'Quantum Code', creator: 'Sarah Kim', rating: 4.8, downloads: 8920, price: 0, category: 'Code Gen', verified: true, trending: false, tags: ['GPT-4', 'Code Completion', 'TypeScript'], preview: '/api/placeholder/400/300'
+  },
+  {
+    id: '3', name: 'PixelForge XL', creator: 'Jamie Ruiz', rating: 4.95, downloads: 21500, price: 49, category: 'Image Gen', verified: true, trending: true, tags: ['Midjourney', '4K', 'Artistic'], preview: '/api/placeholder/400/300'
+  },
+  {
+    id: '4', name: 'SynthText Pro', creator: 'Elena Voss', rating: 4.7, downloads: 6730, price: 19, category: 'Text Gen', verified: false, trending: false, tags: ['Llama 2', 'Creative', 'Longform'], preview: '/api/placeholder/400/300'
+  },
+  {
+    id: '5', name: 'VectorFlow', creator: 'Marcus Lee', rating: 4.85, downloads: 18900, price: 39, category: 'Image Gen', verified: true, trending: true, tags: ['SVG', 'Vector', 'Logo Design'], preview: '/api/placeholder/400/300'
+  },
+  {
+    id: '6', name: 'CodeMaster AI', creator: 'Priya Singh', rating: 4.92, downloads: 23400, price: 0, category: 'Code Gen', verified: true, trending: false, tags: ['Rust', 'Smart Contracts', 'Web3'], preview: '/api/placeholder/400/300'
+  },
+  {
+    id: '7', name: 'DreamScape', creator: 'Luca Rossi', rating: 4.88, downloads: 15600, price: 59, category: 'Image Gen', verified: true, trending: true, tags: ['Dreams', 'Surreal', '8K'], preview: '/api/placeholder/400/300'
+  },
+  {
+    id: '8', name: 'Narrative Engine', creator: 'Aiko Tanaka', rating: 4.75, downloads: 8900, price: 25, category: 'Text Gen', verified: false, trending: false, tags: ['Stories', 'RPG', 'Interactive'], preview: '/api/placeholder/400/300'
+  },
+  {
+    id: '9', name: 'HyperVision 4K', creator: 'David Park', rating: 4.96, downloads: 31200, price: 79, category: 'Image Gen', verified: true, trending: true, tags: ['4K', 'Realistic', 'Portrait'], preview: '/api/placeholder/400/300'
+  },
+  {
+    id: '10', name: 'SmartContract Pro', creator: 'Rohan Patel', rating: 4.91, downloads: 14500, price: 45, category: 'Code Gen', verified: true, trending: false, tags: ['Solidity', 'Ethereum', 'DeFi'], preview: '/api/placeholder/400/300'
+  },
+  {
+    id: '11', name: 'Cosmic Art', creator: 'Luna Morales', rating: 4.82, downloads: 19800, price: 35, category: 'Image Gen', verified: true, trending: true, tags: ['Space', 'Nebula', 'Sci-Fi'], preview: '/api/placeholder/400/300'
+  },
+  {
+    id: '12', name: 'Poetry Master', creator: 'Emma Wilson', rating: 4.78, downloads: 7650, price: 15, category: 'Text Gen', verified: false, trending: false, tags: ['Poetry', 'Creative', 'Rhyme'], preview: '/api/placeholder/400/300'
+  }
 ]
