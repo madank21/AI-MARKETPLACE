@@ -4,10 +4,20 @@ import { cn } from '@/lib/utils'
 import { GlowCard } from './glow-card'
 import { GradientText } from './gradient-text'
 import { Badge } from './badge'
-import { Star, Zap, TrendingUp, Download, Clock, CheckCircle2 } from 'lucide-react'
+import {
+  Star,
+  Zap,
+  TrendingUp,
+  Download,
+  Clock,
+  CheckCircle2,
+} from 'lucide-react'
+
 import type { AIModel } from '@/lib/mock-data'
+
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 
 interface ModelCardProps {
   model: AIModel
@@ -15,32 +25,60 @@ interface ModelCardProps {
   className?: string
 }
 
-export function ModelCard({ model, variant = 'default', className }: ModelCardProps) {
-  const glowColor = model.trending ? 'purple' : model.featured ? 'cyan' : 'blue'
+export function ModelCard({
+  model,
+  variant = 'default',
+  className,
+}: ModelCardProps) {
+  const glowColor = model.trending
+    ? 'purple'
+    : model.featured
+    ? 'cyan'
+    : 'blue'
 
+  // COMPACT CARD
   if (variant === 'compact') {
     return (
       <Link href={`/models/${model.id}`}>
         <GlowCard
-          className={cn('p-4 cursor-pointer group', className)}
+          className={cn(
+            'p-4 cursor-pointer group transition-all duration-500 hover:scale-[1.02]',
+            className
+          )}
           glowColor={glowColor}
         >
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-              <Zap className="w-6 h-6 text-primary" />
+            
+            {/* RoboHash Avatar */}
+            <div className="relative w-14 h-14 rounded-xl overflow-hidden border border-primary/30 bg-black">
+              <Image
+                src={`https://robohash.org/${encodeURIComponent(
+                  model.name
+                )}?set=set2&bgset=bg1&size=120x120`}
+                alt={model.name}
+                fill
+                unoptimized
+                className="object-cover"
+              />
             </div>
+
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold truncate group-hover:text-primary transition-colors">
                 {model.name}
               </h3>
+
               <p className="text-sm text-muted-foreground truncate">
                 {model.creator.name}
               </p>
             </div>
+
             <div className="text-right">
               <div className="font-mono text-sm font-semibold text-primary">
-                {model.pricing.price === 0 ? 'Free' : `${model.pricing.price} ${model.pricing.currency}`}
+                {model.pricing.price === 0
+                  ? 'Free'
+                  : `${model.pricing.price} ${model.pricing.currency}`}
               </div>
+
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
                 {model.stats.rating}
@@ -55,131 +93,188 @@ export function ModelCard({ model, variant = 'default', className }: ModelCardPr
   return (
     <Link href={`/models/${model.id}`}>
       <motion.div
-        whileHover={{ y: -5 }}
-        transition={{ duration: 0.2 }}
+        whileHover={{ y: -8 }}
+        transition={{ duration: 0.25 }}
+        className="h-full"
       >
         <GlowCard
           className={cn(
-            'overflow-hidden cursor-pointer group h-full',
-            variant === 'featured' && 'ring-1 ring-primary/50',
+            'overflow-hidden cursor-pointer group h-full border border-border/50 hover:border-primary/40 transition-all duration-700 bg-background/40 backdrop-blur-xl',
+            variant === 'featured' &&
+              'ring-1 ring-primary/50 shadow-primary/20',
             className
           )}
           glowColor={glowColor}
         >
-          {/* Header with gradient background */}
-          <div className="relative h-32 bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/20 p-4">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
-            
+          {/* AI Preview Image */}
+          <div className="relative h-52 overflow-hidden">
+            <Image
+              src={`https://robohash.org/${encodeURIComponent(
+                model.name
+              )}?set=set2&bgset=bg1&size=500x300`}
+              alt={model.name}
+              fill
+              unoptimized
+              className="object-cover scale-110 group-hover:scale-125 transition-transform duration-700"
+            />
+
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+
+            {/* Glow */}
+            <div className="absolute inset-0 bg-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-2xl" />
+
             {/* Badges */}
-            <div className="relative flex gap-2 flex-wrap">
+            <div className="absolute top-4 left-4 flex flex-wrap gap-2 z-20">
               {model.verified && (
-                <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30">
+                <Badge className="bg-emerald-500/90 text-white border-none backdrop-blur-xl">
                   <CheckCircle2 className="w-3 h-3 mr-1" />
                   Verified
                 </Badge>
               )}
+
               {model.trending && (
-                <Badge variant="secondary" className="bg-secondary/20 text-secondary border-secondary/30">
+                <Badge className="bg-orange-500/90 text-white border-none backdrop-blur-xl">
                   <TrendingUp className="w-3 h-3 mr-1" />
                   Trending
                 </Badge>
               )}
+
               {model.featured && (
-                <Badge variant="secondary" className="bg-accent/20 text-accent border-accent/30">
+                <Badge className="bg-purple-500/90 text-white border-none backdrop-blur-xl">
                   <Star className="w-3 h-3 mr-1" />
                   Featured
                 </Badge>
               )}
             </div>
 
-            {/* Category icon */}
-            <div className="absolute bottom-4 right-4 w-12 h-12 rounded-xl bg-card/80 backdrop-blur flex items-center justify-center">
-              <Zap className="w-6 h-6 text-primary" />
+            {/* Category */}
+            <div className="absolute bottom-4 right-4">
+              <Badge className="bg-black/60 backdrop-blur-xl text-white border-white/10">
+                {model.category}
+              </Badge>
             </div>
           </div>
 
           {/* Content */}
-          <div className="p-5 space-y-4">
-            {/* Title and creator */}
-            <div>
-              <h3 className="font-semibold text-lg group-hover:text-primary transition-colors line-clamp-1">
-                {model.name}
-              </h3>
-              <div className="flex items-center gap-2 mt-1">
-                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-primary to-secondary" />
-                <span className="text-sm text-muted-foreground">{model.creator.name}</span>
-                {model.creator.verified && (
-                  <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-                )}
+          <div className="p-5 space-y-5">
+            
+            {/* Creator */}
+            <div className="flex items-center gap-3">
+              <div className="relative w-11 h-11 rounded-full overflow-hidden border border-primary/30">
+                <Image
+                  src={`https://robohash.org/${encodeURIComponent(
+                    model.creator.name
+                  )}?set=set1&size=100x100`}
+                  alt={model.creator.name}
+                  fill
+                  unoptimized
+                  className="object-cover"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-medium">
+                    {model.creator.name}
+                  </span>
+
+                  {model.creator.verified && (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                  )}
+                </div>
+
+                <p className="text-xs text-muted-foreground">
+                  AI Creator
+                </p>
               </div>
             </div>
 
-            {/* Description */}
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {model.shortDescription}
-            </p>
+            {/* Title */}
+            <div>
+              <h3 className="font-bold text-xl line-clamp-1 group-hover:text-primary transition-colors">
+                {model.name}
+              </h3>
+
+              <p className="text-sm text-muted-foreground mt-2 line-clamp-2 leading-relaxed">
+                {model.shortDescription}
+              </p>
+            </div>
 
             {/* Tags */}
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {model.tags.slice(0, 3).map((tag) => (
-                <Badge key={tag} variant="outline" className="text-xs bg-muted/50">
+                <Badge
+                  key={tag}
+                  variant="outline"
+                  className="bg-muted/40 border-primary/20 text-xs"
+                >
                   {tag}
                 </Badge>
               ))}
             </div>
 
             {/* Stats */}
-            <div className="flex items-center justify-between pt-3 border-t border-border/50">
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Star className="w-4 h-4 fill-yellow-500 text-yellow-500" />
+            <div className="flex items-center justify-between pt-2">
+              <div className="flex items-center gap-4 text-sm">
+                <div className="flex items-center gap-1 text-yellow-400">
+                  <Star className="w-4 h-4 fill-yellow-400" />
                   {model.stats.rating}
-                </span>
-                <span className="flex items-center gap-1">
+                </div>
+
+                <div className="flex items-center gap-1 text-muted-foreground">
                   <Download className="w-4 h-4" />
                   {formatNumber(model.stats.downloads)}
-                </span>
-                <span className="flex items-center gap-1">
+                </div>
+
+                <div className="flex items-center gap-1 text-muted-foreground">
                   <Clock className="w-4 h-4" />
                   {model.stats.avgLatency}ms
-                </span>
+                </div>
               </div>
             </div>
 
-            {/* Price */}
-            <div className="flex items-center justify-between">
+            {/* Footer */}
+            <div className="flex items-center justify-between pt-4 border-t border-border/40">
               <div>
                 {model.pricing.type === 'free' ? (
-                  <GradientText variant="blue-cyan" className="font-semibold">
-                    Free
+                  <GradientText
+                    variant="blue-cyan"
+                    className="font-black text-xl"
+                  >
+                    FREE
                   </GradientText>
                 ) : (
-                  <div className="flex items-baseline gap-1">
-                    <span className="font-mono font-semibold text-foreground">
+                  <div className="flex items-end gap-1">
+                    <span className="font-black text-2xl text-primary">
                       {model.pricing.price}
                     </span>
-                    <span className="text-sm text-muted-foreground">
+
+                    <span className="text-muted-foreground text-sm mb-1">
                       {model.pricing.currency}
                     </span>
-                    {model.pricing.perUnit && (
-                      <span className="text-xs text-muted-foreground">
-                        / {model.pricing.perUnit}
-                      </span>
-                    )}
                   </div>
                 )}
               </div>
-              <Badge 
-                variant="outline" 
-                className={cn(
-                  'capitalize',
-                  model.pricing.type === 'free' && 'border-green-500/50 text-green-500',
-                  model.pricing.type === 'pay-per-use' && 'border-primary/50 text-primary',
-                  model.pricing.type === 'subscription' && 'border-secondary/50 text-secondary',
-                )}
+
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="
+                  px-5 py-2.5
+                  rounded-xl
+                  bg-gradient-to-r
+                  from-primary
+                  to-cyan-500
+                  text-white
+                  font-semibold
+                  shadow-lg
+                  hover:shadow-cyan-500/30
+                  transition-all
+                "
               >
-                {model.pricing.type.replace('-', ' ')}
-              </Badge>
+                Try Now
+              </motion.button>
             </div>
           </div>
         </GlowCard>
@@ -189,7 +284,11 @@ export function ModelCard({ model, variant = 'default', className }: ModelCardPr
 }
 
 function formatNumber(num: number): string {
-  if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`
-  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`
+  if (num >= 1000000)
+    return `${(num / 1000000).toFixed(1)}M`
+
+  if (num >= 1000)
+    return `${(num / 1000).toFixed(1)}K`
+
   return num.toString()
 }

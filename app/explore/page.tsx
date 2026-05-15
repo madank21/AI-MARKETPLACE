@@ -58,12 +58,12 @@ function ModelCard({ model }: { model: typeof models[0] }) {
           whileHover={{ scale: 1.03 }}
         >
           <Image
-            src={model.image}
-            alt={model.name}
-            fill
-            className="object-cover brightness-75 group-hover:brightness-100 transition-all duration-700"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
+  src={`https://robohash.org/${encodeURIComponent(model.name)}?set=set1&size=400x300`}
+  alt={model.name}
+  fill
+  unoptimized
+  className="object-cover brightness-90 group-hover:brightness-100 transition-all duration-700"
+/>
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
           <div className="absolute bottom-3 left-3">
             <Badge className="bg-white/90 text-black font-bold shadow-lg px-3 py-1 backdrop-blur-sm">
@@ -291,7 +291,7 @@ export default function ExplorePage() {
           <StaggerContainer
             key={`${layout}-${loading}`}
             className={cn(
-              'gap-8',
+              'grid gap-8 w-full',
               layout === 'grid' 
                 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
                 : 'grid-cols-1'
@@ -330,7 +330,7 @@ export default function ExplorePage() {
           viewport={{ once: true }}
           className="text-center mt-32"
         >
-          // Replace the Load More button (line with size="xl"):
+          
 <Button 
   className="px-16 py-8 text-2xl font-black shadow-2xl backdrop-blur-2xl border-2 border-primary/50 hover:shadow-primary/40 hover:border-primary/80 hover:scale-105 transition-all duration-500 group text-lg h-auto"
 >
