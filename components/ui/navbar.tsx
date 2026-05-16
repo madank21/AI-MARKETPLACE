@@ -128,170 +128,180 @@ export function Navbar() {
                 </Button>
 
               {/* Connect Wallet / User Profile 👇 ROBOHASH HERE */}
-              <div className="hidden sm:block">
-                <ConnectButton.Custom>
-                  {({
-                    account,
-                    chain,
-                    openAccountModal,
-                    openChainModal,
-                    openConnectModal,
-                    mounted,
-                  }) => {
-                    const ready = mounted
-                    const connected = ready && account && chain
+              
+              {/* Auth + Wallet Section */}
+<div className="hidden sm:flex items-center gap-3">
 
-                    return (
-                      <div
-                        {...(!ready && {
-                          'aria-hidden': true,
-                          style: {
-                            opacity: 0,
-                            pointerEvents: 'none',
-                            userSelect: 'none',
-                          },
-                        })}
-                      >
-                        {(() => {
-                          if (!connected) {
-                            return (
-                              <motion.div whileHover={{ scale: 1.02 }}>
-                                <Button
-                                  onClick={openConnectModal}
-                                  className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-sm font-bold shadow-lg hover:shadow-primary/25 px-6 h-11"
-                                >
-                                  Connect
-                                </Button>
-                              </motion.div>
-                            )
-                          }
+  {/* Login */}
+  <Link href="/auth/login">
+    <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+      <Button
+        variant="ghost"
+        className="h-11 px-5 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl hover:bg-white/10 hover:border-cyan-400/40 transition-all duration-300 font-semibold"
+      >
+        Login
+      </Button>
+    </motion.div>
+  </Link>
 
-                          if (chain.unsupported) {
-                            return (
-                              <Button
-                                onClick={openChainModal}
-                                variant="destructive"
-                                className="shadow-lg h-11"
-                              >
-                                Wrong Network
-                              </Button>
-                            )
-                          }
+  {/* Signup */}
+  <Link href="/auth/signup">
+    <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+      <Button
+        className="h-11 px-6 rounded-2xl font-bold bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 shadow-[0_0_30px_rgba(59,130,246,0.35)] border border-cyan-400/20"
+      >
+        Sign Up
+      </Button>
+    </motion.div>
+  </Link>
 
-                          // 👇 ROBOHASH AVATAR FOR CONNECTED USER
-                          return (
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <motion.div 
-                                  className="flex items-center gap-3 p-2.5 rounded-2xl hover:bg-muted/50 cursor-pointer transition-all group backdrop-blur-sm border border-border/50 hover:border-primary/50 hover:shadow-lg"
-                                  whileHover={{ scale: 1.02 }}
-                                  whileTap={{ scale: 0.98 }}
-                                >
-                                  {/* ROBOT AVATAR 👇 */}
-                                  <RobohashAvatar 
-                                    name={account.displayName} 
-                                    size={44}
-                                    className="ring-2 ring-white/50 shadow-md group-hover:ring-primary/60 transition-all duration-300" 
-                                  />
-                                  
-                                  {/* User Info */}
-                                  <div className="hidden lg:block min-w-0">
-                                    <p className="font-bold text-sm truncate max-w-[140px]">{account.displayName}</p>
-                                    <p className="text-xs text-muted-foreground truncate max-w-[140px]">
-                                      {chain.name}
-                                    </p>
-                                  </div>
-                                  
-                                  <motion.div 
-                                    className="w-2 h-2 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full ml-1.5"
-                                    layoutId="status-dot"
-                                    animate={{ scale: [1, 1.2, 1] }}
-                                    transition={{ repeat: Infinity, duration: 2 }}
-                                  />
-                                  <ChevronDown className="w-4 h-4 ml-1 text-muted-foreground group-hover:rotate-180 transition-transform duration-300" />
-                                </motion.div>
-                              </DropdownMenuTrigger>
-                              
-                              {/* Enhanced Dropdown 👇 */}
-                              <DropdownMenuContent 
-                                align="end" 
-                                className="w-80 p-3 backdrop-blur-xl border border-white/10 shadow-2xl shadow-primary/20 mr-2 rounded-2xl"
-                              >
-                                {/* Profile Header with Large Avatar */}
-                                <motion.div 
-                                  initial={{ opacity: 0, scale: 0.95 }}
-                                  animate={{ opacity: 1, scale: 1 }}
-                                  className="p-5 border-b border-border/30 rounded-2xl mb-3 bg-gradient-to-br from-muted/30 to-transparent"
-                                >
-                                  <div className="flex items-center gap-4">
-                                    <RobohashAvatar 
-                                      name={account.displayName} 
-                                      size={56}
-                                      className="shadow-xl ring-4 ring-white/40" 
-                                    />
-                                    <div className="min-w-0 flex-1">
-                                      <p className="font-black text-lg truncate">{account.displayName}</p>
-                                      <p className="text-sm text-muted-foreground truncate">{account.address.slice(0, 6)}...{account.address.slice(-4)}</p>
-                                      <div className="flex items-center gap-2 mt-1">
-                                        <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full" />
-                                        <span className="text-xs font-medium text-emerald-600">Online</span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </motion.div>
+  {/* Wallet */}
+  <ConnectButton.Custom>
+    {({
+      account,
+      chain,
+      openAccountModal,
+      openChainModal,
+      openConnectModal,
+      mounted,
+    }) => {
+      const ready = mounted
+      const connected = ready && account && chain
 
-                                {/* Menu Items */}
-                                <DropdownMenuItem asChild className="rounded-xl cursor-pointer hover:bg-muted/50 p-3 mx-1 -my-1 w-full">
-                                  <Link href="/dashboard" className="flex items-center gap-3">
-                                    <LayoutDashboard className="w-5 h-5 text-primary shrink-0" />
-                                    <span>Dashboard</span>
-                                  </Link>
-                                </DropdownMenuItem>
-                                
-                                <DropdownMenuItem asChild className="rounded-xl cursor-pointer hover:bg-muted/50 p-3 mx-1 -my-1 w-full">
-                                  <Link href="/portfolio" className="flex items-center gap-3">
-                                    <Users className="w-5 h-5 text-secondary shrink-0" />
-                                    <span>Portfolio</span>
-                                  </Link>
-                                </DropdownMenuItem>
-                                
-                                <DropdownMenuItem asChild className="rounded-xl cursor-pointer hover:bg-muted/50 p-3 mx-1 -my-1 w-full">
-                                  <Link href="/creators" className="flex items-center gap-3">
-                                    <Users className="w-5 h-5 text-accent shrink-0" />
-                                    <span>Creators</span>
-                                  </Link>
-                                </DropdownMenuItem>
-                                
-                                <DropdownMenuSeparator className="my-2 bg-border/50 mx-1" />
-                                
-                                <DropdownMenuItem 
-                                  onClick={openChainModal}
-                                  className="rounded-xl cursor-pointer hover:bg-muted/50 p-3 mx-1 -my-1 text-muted-foreground"
-                                >
-                                  <div className="flex items-center gap-3">
-                                    {chain.hasIcon && chain.iconUrl && (
-                                      <img src={chain.iconUrl} alt={chain.name} className="w-6 h-6 rounded-full" />
-                                    )}
-                                    <span>Switch Network</span>
-                                  </div>
-                                </DropdownMenuItem>
-                                
-                                <DropdownMenuItem 
-                                  onClick={openAccountModal}
-                                  className="rounded-xl cursor-pointer hover:bg-destructive/10 p-3 mx-1 -my-1 text-destructive font-semibold"
-                                >
-                                  <LogOut className="w-5 h-5 mr-3" />
-                                  Disconnect Wallet
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          )
-                        })()}
-                      </div>
-                    )
-                  }}
-                </ConnectButton.Custom>
+      if (!ready) {
+        return (
+          <div className="h-11 w-32 rounded-2xl bg-white/5 animate-pulse" />
+        )
+      }
+
+      // NOT CONNECTED
+      if (!connected) {
+        return (
+          <motion.div
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            <Button
+              onClick={openConnectModal}
+              className="h-11 px-6 rounded-2xl font-bold bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 shadow-[0_0_30px_rgba(16,185,129,0.35)]"
+            >
+              Connect Wallet
+            </Button>
+          </motion.div>
+        )
+      }
+
+      // WRONG NETWORK
+      if (chain.unsupported) {
+        return (
+          <Button
+            onClick={openChainModal}
+            variant="destructive"
+            className="h-11 rounded-2xl font-bold"
+          >
+            Wrong Network
+          </Button>
+        )
+      }
+
+      // CONNECTED
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex items-center gap-3 p-2 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl hover:border-cyan-400/40 transition-all cursor-pointer"
+            >
+              <RobohashAvatar
+                name={account.displayName}
+                size={42}
+                className="ring-2 ring-cyan-400/30"
+              />
+
+              <div className="hidden lg:block">
+                <p className="text-sm font-bold max-w-[120px] truncate">
+                  {account.displayName}
+                </p>
+
+                <p className="text-xs text-muted-foreground">
+                  {chain.name}
+                </p>
               </div>
+
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+
+              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+            </motion.div>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent
+            align="end"
+            className="w-80 p-3 rounded-3xl border border-white/10 bg-black/60 backdrop-blur-2xl shadow-2xl"
+          >
+            {/* Header */}
+            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 mb-3">
+              <div className="flex items-center gap-4">
+                <RobohashAvatar
+                  name={account.displayName}
+                  size={56}
+                />
+
+                <div className="min-w-0">
+                  <p className="font-black truncate">
+                    {account.displayName}
+                  </p>
+
+                  <p className="text-xs text-muted-foreground truncate">
+                    {account.address}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Items */}
+            <DropdownMenuItem asChild>
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-3 rounded-xl p-3 cursor-pointer"
+              >
+                <LayoutDashboard className="w-5 h-5 text-cyan-400" />
+                Dashboard
+              </Link>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem asChild>
+              <Link
+                href="/settings"
+                className="flex items-center gap-3 rounded-xl p-3 cursor-pointer"
+              >
+                <Settings className="w-5 h-5 text-purple-400" />
+                Settings
+              </Link>
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem
+              onClick={openChainModal}
+              className="rounded-xl p-3 cursor-pointer"
+            >
+              Switch Network
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={openAccountModal}
+              className="rounded-xl p-3 cursor-pointer text-red-400"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Disconnect Wallet
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    }}
+  </ConnectButton.Custom>
+</div>
 
               {/* Mobile Menu Button */}
               <Button
