@@ -1,5 +1,5 @@
 'use client'
-
+import {Navbar} from '@/components/ui/navbar'
 import { Search, Grid, List, Star, Zap, Crown, TrendingUp, Download } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
@@ -158,6 +158,7 @@ export default function ExplorePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/10 to-slate-900/90 relative overflow-hidden">
+      <Navbar />
       {/* Floating Particles */}
       <div className="absolute inset-0 pointer-events-none">
         {[0, 1, 2].map((i) => (
