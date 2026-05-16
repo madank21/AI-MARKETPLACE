@@ -1,32 +1,27 @@
+// app/dashboard/layout.tsx
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { GradientText } from '@/components/ui/gradient-text'
 import { Button } from '@/components/ui/button'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import {
   LayoutDashboard,
-  Zap,
   Key,
   CreditCard,
   Settings,
   Bell,
-  HelpCircle,
   Menu,
   X,
   Sparkles,
   ChevronRight,
-  TrendingUp,
   Users,
-  Shield,
   LogOut,
   Brain,
   BarChart3,
-  Globe,
   Cpu,
   Rocket,
   FlaskConical,
@@ -37,6 +32,7 @@ import {
   Activity,
 } from 'lucide-react'
 
+// Interfaces
 interface SidebarLink {
   href: string
   label: string
@@ -51,6 +47,7 @@ interface SidebarGroup {
   links: SidebarLink[]
 }
 
+// Navigation groups
 const userGroups: SidebarGroup[] = [
   {
     label: 'CORE',
@@ -85,64 +82,7 @@ const userGroups: SidebarGroup[] = [
   },
 ]
 
-const creatorGroups: SidebarGroup[] = [
-  {
-    label: 'STUDIO',
-    links: [
-      { href: '/creator', label: 'Overview', icon: LayoutDashboard },
-      { href: '/creator/models', label: 'My Models', icon: Brain, badge: '3' },
-      { href: '/creator/playground', label: 'Playground', icon: FlaskConical, isNew: true },
-      { href: '/creator/publish', label: 'Publish Model', icon: Rocket, isNew: true },
-    ],
-  },
-  {
-    label: 'GROWTH',
-    links: [
-      { href: '/creator/analytics', label: 'Analytics', icon: BarChart3 },
-      { href: '/creator/earnings', label: 'Earnings', icon: CreditCard },
-      { href: '/creator/audience', label: 'Audience', icon: Users },
-      { href: '/creator/reviews', label: 'Reviews', icon: Star },
-    ],
-  },
-  {
-    label: 'RESOURCES',
-    links: [
-      { href: '/creator/docs', label: 'Documentation', icon: BookOpen },
-      { href: '/creator/settings', label: 'Settings', icon: Settings },
-    ],
-  },
-]
-
-const adminGroups: SidebarGroup[] = [
-  {
-    label: 'CONTROL',
-    links: [
-      { href: '/admin', label: 'Overview', icon: LayoutDashboard },
-      { href: '/admin/users', label: 'Users', icon: Users, badge: '1.2k' },
-      { href: '/admin/models', label: 'Models', icon: Brain },
-    ],
-  },
-  {
-    label: 'SECURITY',
-    links: [
-      { href: '/admin/moderation', label: 'Moderation', icon: Shield, badge: '12', badgeColor: 'pink' },
-      { href: '/admin/compute', label: 'Compute Grid', icon: Cpu },
-      { href: '/admin/network', label: 'Network', icon: Globe },
-    ],
-  },
-  {
-    label: 'SYSTEM',
-    links: [
-      { href: '/admin/settings', label: 'Settings', icon: Settings },
-    ],
-  },
-]
-
-interface DashboardLayoutProps {
-  children: React.ReactNode
-  variant?: 'user' | 'creator' | 'admin'
-}
-
+// Neural Network Background
 function NeuralNetBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -211,30 +151,19 @@ function NeuralNetBg() {
   )
 }
 
-export function DashboardLayout({ children, variant = 'user' }: DashboardLayoutProps) {
+// Main Dashboard Layout Component
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [notifications, setNotifications] = useState(4)
   const pathname = usePathname()
   const prefersReduced = useReducedMotion()
 
-  const groups =
-    variant === 'admin' ? adminGroups :
-    variant === 'creator' ? creatorGroups :
-    userGroups
-
-  const title =
-    variant === 'admin' ? 'Admin Control' :
-    variant === 'creator' ? 'Creator Studio' :
-    'Neural Dashboard'
-
-  const logoGradient =
-    variant === 'admin' ? 'from-red-500 to-orange-500' :
-    variant === 'creator' ? 'from-purple-500 to-pink-500' :
-    'from-cyan-400 to-blue-600'
-
   return (
     <div className="min-h-screen" style={{ background: 'oklch(0.07 0.02 270)' }}>
-
       {/* Ambient background blobs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div
@@ -251,14 +180,11 @@ export function DashboardLayout({ children, variant = 'user' }: DashboardLayoutP
         />
       </div>
 
+      {/* CSS Animations */}
       <style>{`
         @keyframes blobDrift {
           0% { transform: translate(0,0) scale(1); }
           100% { transform: translate(30px, 20px) scale(1.1); }
-        }
-        @keyframes scanline {
-          0% { transform: translateY(-100%); }
-          100% { transform: translateY(100vh); }
         }
         @keyframes glowPulse {
           0%, 100% { opacity: 0.6; }
@@ -320,15 +246,12 @@ export function DashboardLayout({ children, variant = 'user' }: DashboardLayoutP
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        {/* Animated neural net in background */}
         <NeuralNetBg />
 
         {/* Logo */}
         <div className="relative z-10 p-5 flex items-center gap-3 border-b border-white/5">
-          <div className={cn(
-            'w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br shadow-lg',
-            logoGradient
-          )} style={{ boxShadow: '0 0 20px rgba(100,180,255,0.3)' }}>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-cyan-400 to-blue-600 shadow-lg"
+            style={{ boxShadow: '0 0 20px rgba(100,180,255,0.3)' }}>
             <Brain className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -341,7 +264,7 @@ export function DashboardLayout({ children, variant = 'user' }: DashboardLayoutP
               NEXUS<span style={{ WebkitTextFillColor: 'oklch(0.75 0.15 195)' }}>.AI</span>
             </div>
             <div className="text-[10px] tracking-[0.15em] uppercase" style={{ color: 'oklch(0.55 0.05 270)' }}>
-              {title}
+              Neural Dashboard
             </div>
           </div>
           <button
@@ -354,7 +277,7 @@ export function DashboardLayout({ children, variant = 'user' }: DashboardLayoutP
 
         {/* Navigation */}
         <nav className="relative z-10 flex-1 overflow-y-auto py-4 px-3 space-y-6 scrollbar-none">
-          {groups.map((group) => (
+          {userGroups.map((group) => (
             <div key={group.label}>
               <div className="px-3 mb-2 text-[10px] font-bold tracking-[0.2em]"
                 style={{ color: 'oklch(0.4 0.05 270)' }}>
@@ -394,13 +317,9 @@ export function DashboardLayout({ children, variant = 'user' }: DashboardLayoutP
                       {link.badge && !link.isNew && (
                         <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center"
                           style={{
-                            background: link.badgeColor === 'pink'
-                              ? 'oklch(0.7 0.25 330 / 0.2)'
-                              : 'oklch(0.7 0.2 250 / 0.2)',
-                            color: link.badgeColor === 'pink'
-                              ? 'oklch(0.85 0.2 330)'
-                              : 'oklch(0.8 0.15 250)',
-                            border: `1px solid ${link.badgeColor === 'pink' ? 'oklch(0.7 0.25 330 / 0.3)' : 'oklch(0.7 0.2 250 / 0.3)'}`,
+                            background: 'oklch(0.7 0.2 250 / 0.2)',
+                            color: 'oklch(0.8 0.15 250)',
+                            border: '1px solid oklch(0.7 0.2 250 / 0.3)',
                           }}>
                           {link.badge}
                         </span>
@@ -435,7 +354,6 @@ export function DashboardLayout({ children, variant = 'user' }: DashboardLayoutP
           </button>
         </div>
 
-        {/* Version tag */}
         <div className="relative z-10 px-5 pb-4 text-[10px] tracking-wider" style={{ color: 'oklch(0.35 0.03 270)' }}>
           NEXUS v2.4.0 · MAINNET
         </div>
@@ -443,12 +361,9 @@ export function DashboardLayout({ children, variant = 'user' }: DashboardLayoutP
 
       {/* MAIN CONTENT */}
       <div className="lg:pl-64 relative z-10">
-
         {/* TOP BAR */}
         <header className="sticky top-0 z-30 topbar-glass">
           <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
-
-            {/* Mobile menu */}
             <button
               className="lg:hidden p-2 rounded-lg hover:bg-white/5 transition-colors"
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -456,33 +371,20 @@ export function DashboardLayout({ children, variant = 'user' }: DashboardLayoutP
               <Menu className="w-5 h-5" style={{ color: 'oklch(0.7 0 0)' }} />
             </button>
 
-            {/* Breadcrumb */}
             <div className="hidden lg:flex items-center gap-2 text-sm">
               <Sparkles className="w-4 h-4" style={{ color: 'oklch(0.7 0.2 250)' }} />
               <span style={{ color: 'oklch(0.45 0.03 270)', fontFamily: "'Space Mono', monospace", fontSize: '11px', letterSpacing: '0.08em' }}>
-                {title.toUpperCase()}
+                NEURAL DASHBOARD
               </span>
-              {pathname !== '/dashboard' && pathname !== '/creator' && pathname !== '/admin' && (
-                <>
-                  <ChevronRight className="w-3.5 h-3.5" style={{ color: 'oklch(0.35 0.03 270)' }} />
-                  <span className="font-medium capitalize text-white text-xs tracking-wide">
-                    {pathname.split('/').pop()?.replace(/-/g, ' ')}
-                  </span>
-                </>
-              )}
             </div>
 
-            {/* Right side */}
             <div className="flex items-center gap-2 ml-auto">
-
-              {/* Live status */}
               <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full"
                 style={{ background: 'oklch(0.5 0.2 150 / 0.1)', border: '1px solid oklch(0.5 0.2 150 / 0.25)' }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400" style={{ boxShadow: '0 0 6px oklch(0.7 0.2 150)', animation: 'glowPulse 2s ease-in-out infinite' }} />
                 <span className="text-[10px] font-bold tracking-widest" style={{ color: 'oklch(0.7 0.2 150)' }}>LIVE</span>
               </div>
 
-              {/* Notifications */}
               <button
                 className="relative p-2 rounded-lg transition-all hover:bg-white/5"
                 onClick={() => setNotifications(0)}
@@ -499,7 +401,6 @@ export function DashboardLayout({ children, variant = 'user' }: DashboardLayoutP
                 )}
               </button>
 
-              {/* Wallet connect */}
               <ConnectButton.Custom>
                 {({ account, chain, openAccountModal, openConnectModal, mounted }) => {
                   const ready = mounted
@@ -542,7 +443,6 @@ export function DashboardLayout({ children, variant = 'user' }: DashboardLayoutP
             </div>
           </div>
 
-          {/* Animated bottom border */}
           <div className="h-px w-full" style={{
             background: 'linear-gradient(90deg, transparent, oklch(0.7 0.2 250 / 0.4), oklch(0.75 0.15 195 / 0.4), transparent)',
             backgroundSize: '200% 100%',

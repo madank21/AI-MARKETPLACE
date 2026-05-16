@@ -109,6 +109,9 @@ export default function DashboardPage() {
 
               {/* User Info */}
               <div className="flex-1 text-center md:text-left">
+                <h1 >
+                   Welcome back
+                </h1>
                 <h1 className="text-2xl sm:text-3xl font-bold mb-2">
                   Welcome back,{' '}
                   {user?.fullName || user?.username ? (

@@ -29,7 +29,6 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen bg-background">
-      <Navbar />
       <ParticleField className="opacity-20" particleCount={40} />
       
       <div className="relative min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-12">
