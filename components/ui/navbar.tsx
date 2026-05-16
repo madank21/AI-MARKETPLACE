@@ -137,14 +137,14 @@ export function Navbar() {
     <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
       <Button
         variant="ghost"
-        className="h-11 px-5 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl hover:bg-white/10 hover:border-cyan-400/40 transition-all duration-300 font-semibold"
-      >
+      className="h-11 px-6 rounded-2xl font-bold bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 shadow-[0_0_30px_rgba(59,130,246,0.35)] border border-cyan-400/20"
+      >      
         Login
       </Button>
     </motion.div>
   </Link>
 
-  {/* Signup */}
+  {/* Signup
   <Link href="/auth/signup">
     <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
       <Button
@@ -153,7 +153,7 @@ export function Navbar() {
         Sign Up
       </Button>
     </motion.div>
-  </Link>
+  </Link> */}
 
   {/* Wallet */}
   <ConnectButton.Custom>

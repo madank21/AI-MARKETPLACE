@@ -3,6 +3,8 @@ import { Inter, JetBrains_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Providers } from '@/components/providers'
 import './globals.css'
+import { ClerkProvider } from '@clerk/nextjs'
+
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -43,13 +45,15 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} dark bg-background`}>
-      <body className="font-sans antialiased min-h-screen bg-background text-foreground">
-        <Providers>
-          {children}
-        </Providers>
-        {process.env.NODE_ENV === 'production' && <Analytics />}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} dark bg-background`}>
+        <body className="font-sans antialiased min-h-screen bg-background text-foreground">
+          <Providers>
+            {children}
+          </Providers>
+          {process.env.NODE_ENV === 'production' && <Analytics />}
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }
