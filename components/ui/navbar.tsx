@@ -32,6 +32,8 @@ import {
 } from './dropdown-menu'
 import { AISearch } from './ai-search'
 import { NotificationsPanel } from './notifications-panel'
+import { useUser, UserButton, SignInButton } from '@clerk/nextjs'
+import { User } from 'lucide-react'
 
 const navItems = [
   { href: '/marketplace', label: 'Marketplace', icon: Store },
@@ -46,6 +48,7 @@ export function Navbar() {
   const pathname = usePathname()
   const [searchOpen, setSearchOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const { user, isLoaded, isSignedIn } = useUser()
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20)
@@ -385,6 +388,57 @@ export function Navbar() {
       open={notificationsOpen}
       onClose={() => setNotificationsOpen(false)}
     />
+    <div className="flex items-center gap-4">
+        {isLoaded && isSignedIn ? (
+          <div className="flex items-center gap-3">
+            {/* User Info */}
+            <div className="hidden md:flex items-center gap-2 text-sm">
+              {user?.imageUrl ? (
+                <img 
+                  src={user.imageUrl} 
+                  alt={user.fullName || 'User'} 
+                  className="w-8 h-8 rounded-full"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                  <User className="w-4 h-4 text-white" />
+                </div>
+              )}
+              <div>
+                <p className="font-medium leading-tight">
+                  {user?.fullName || user?.username || 'User'}
+                </p>
+                <p className="text-xs text-muted-foreground leading-tight">
+                  {user?.primaryEmailAddress?.emailAddress || 
+                   user?.primaryWeb3Wallet?.web3Wallet?.slice(0, 6) + '...'}
+                </p>
+              </div>
+            </div>
+            
+            {/* Clerk User Button with dropdown */}
+            <UserButton afterSignOutUrl="/" >
+              <UserButton.MenuItems>
+                <UserButton.Link
+                  label="Dashboard"
+                  labelIcon={<User className="w-4 h-4" />}
+                  href="/dashboard"
+                />
+                <UserButton.Link
+                  label="Profile"
+                  labelIcon={<User className="w-4 h-4" />}
+                  href="/profile"
+                />
+              </UserButton.MenuItems>
+            </UserButton>
+          </div>
+        ) : (
+          <SignInButton mode="modal">
+            <button className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium">
+              Sign In
+            </button>
+          </SignInButton>
+        )}
+      </div>
     </>
   )
 }

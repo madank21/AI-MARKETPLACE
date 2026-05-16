@@ -13,7 +13,7 @@ import { toast } from 'sonner'
 export default function LoginPage() {
   const [authMethod, setAuthMethod] = useState<'wallet' | 'email'>('wallet')
   const [isLoading, setIsLoading] = useState(false)
-  const { isLoaded, signIn, setActive } = useSignIn()
+  //const { isLoaded, signIn, setActive } = useSignIn()
   const { isSignedIn } = useAuth()
   const router = useRouter()
 
