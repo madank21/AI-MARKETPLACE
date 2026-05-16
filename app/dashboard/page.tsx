@@ -80,7 +80,7 @@ export default function DashboardPage() {
       <Navbar />
       <ParticleField className="opacity-10" particleCount={30} />
       
-      <div className="relative max-w-7xl mx-auto px-4 py-12">
+      <div className="relative max-w-7xl mx-auto px-4 py-8">
         {/* Welcome Section with User Profile */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -113,7 +113,6 @@ export default function DashboardPage() {
                    Welcome back
                 </h1>
                 <h1 className="text-2xl sm:text-3xl font-bold mb-2">
-                  Welcome back,{' '}
                   {user?.fullName || user?.username ? (
                     <GradientText variant="blue-cyan">
                       {user.fullName || user.username}
