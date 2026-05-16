@@ -205,3 +205,33 @@ MIT (see `LICENSE` in the repository).
 
 Built with ❤️ for the future of decentralized AI
 
+# NEON db
+# step 1
+Go to Neon
+sign up
+Create Project 
+Project Name	ai-marketplace
+Database Name	neondb
+Region	Closest to you
+# step 2
+Copy Your Connection String
+go to .env
+COPY : postgresql://username:password@ep-xxxx.us-east-2.aws.neon.tech/neondb?sslmode=require
+paste in your .env
+# step 3 Install Prisma
+run : pnpm add prisma @prisma/client
+then 
+run : npx prisma init
+above cmd will creates:
+/prisma/schema.prisma
+.env
+# step 4
+/prisma/schema.prisma
+
+edit it accordingly
+# step 5 EXE
+npx prisma migrate dev --name init
+should show: Your database is now in sync with your schema
+# step 6
+# step 7
+# step 8

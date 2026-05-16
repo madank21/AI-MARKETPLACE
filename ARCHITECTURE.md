@@ -1,3 +1,196 @@
+# NexusAI Architecture (Updated)
+
+NexusAI is a decentralized AI marketplace that connects **creators** (publish and monetize models) with **users** (purchase access and run inference). The architecture combines:
+
+- **Next.js (App Router)** for the UI
+- **Netlify Functions + Next.js API Routes** for backend workflows
+- **Solidity smart contracts** for registry, payments/subscriptions, reputation, and token primitives
+- **PostgreSQL** for application state, accounting, catalog data, and audit logs
+- **IPFS/Pinata** for model artifact storage
+
+For product scope and API endpoint details, see:
+- `README.md`
+- `API.md`
+
+---
+
+## 1) System roles & responsibilities
+
+### Users
+- Browse the marketplace catalog
+- Purchase access (Stripe-first; crypto/subscription flows supported by design)
+- Run inference and view their purchased access
+
+### Creators
+- Upload model artifacts and metadata
+- Manage model versions and operational settings
+- Track earnings, downloads, usage, and rating/reputation signals
+
+### Admins
+- Moderate models/content and handle flagged items
+- Manage users and view platform analytics
+- Review and approve/reject creator submissions
+
+---
+
+## 2) High-level component diagram (logical)
+
+1. **Browser / UI** (Next.js)
+   - Pages and route groups under `app/` (landing, marketplace, auth, dashboards)
+   - Shared UI components in `components/`
+
+2. **App Server (Next.js API routes)**
+   - Core authenticated REST endpoints under `app/api/**`
+
+3. **Serverless workflows (Netlify Functions)**
+   - Sensitive or heavy operations under `netlify/functions/**`
+
+4. **Smart contracts (Solidity)**
+   - `contracts/AIModelRegistry.sol`
+   - `contracts/PaymentManager.sol`
+   - `contracts/ReputationSystem.sol`
+   - `contracts/MarketplaceToken.sol`
+
+5. **Database (PostgreSQL)**
+   - Shared DB connection and data layer under `lib/`
+
+6. **Decentralized storage**
+   - IPFS uploads via Pinata-ready integration
+
+---
+
+## 3) Codebase layout (what maps to what)
+
+### Frontend (Next.js)
+- `app/auth/*` — login/signup UI
+- `app/marketplace/*` — catalog browsing UI
+- `app/models/*` — model detail pages
+- `app/dashboard/*` — user dashboard (purchased access, API keys, usage)
+- `app/creator/*` — creator dashboard (upload, analytics, earnings)
+- `app/admin/*` — admin moderation and analytics
+
+### Shared UI
+- `components/ui/*` — reusable UI primitives (buttons, cards, filters, tables, etc.)
+- `components/landing/*` — landing page sections
+- `components/dashboard/*` — dashboard layout and helpers
+- `components/error-boundary.tsx` — runtime crash boundary
+
+### Shared libraries
+- `lib/api-client.ts` — typed client utilities
+- `lib/database.ts` — DB connection + queries
+- `lib/types.ts` — shared TypeScript types
+- `lib/web3-utils.ts` and `lib/web3-utils.ts` — Web3 helpers (wallet/signing/contract interaction)
+
+### Backend endpoints
+- **Next.js API routes**: `app/api/**`
+  - Auth routes (login/signup/refresh)
+  - Models routes (list/get/creator ops)
+  - Inference routes
+  - Payments routes
+- **Netlify Functions**: `netlify/functions/**`
+  - `authenticate.ts`, `verify-token.ts` — JWT verification
+  - `run-inference.ts` — inference execution runner
+  - `upload-model.ts` — upload model artifacts to IPFS
+  - `create-payment.ts` — Stripe payment creation
+  - `stripe-webhook.ts` — Stripe webhook processor
+
+### Contracts
+- `contracts/*.sol` — on-chain primitives used for registry, payments, reputation, token/staking logic.
+
+---
+
+## 4) Backend flow details (where sensitive work happens)
+
+### Authentication & authorization
+- JWT bearer tokens protect API routes.
+- Roles are enforced via RBAC (**User / Creator / Admin**).
+- Refresh logic exists to maintain sessions.
+
+### Wallet interactions
+- Client uses `wagmi` + `RainbowKit` + `ethers` for wallet connection/signing.
+- Server-side components avoid private key handling; operations rely on signed messages/verified credentials.
+
+### Model publication & discovery
+- Creator dashboard uploads artifacts → IPFS/Pinata.
+- Metadata is stored/indexed (DB) and surfaced in marketplace UI.
+
+### Inference
+- Users call inference endpoints.
+- Serverless runners execute inference and record usage for billing/analytics.
+
+### Payments
+- Stripe Payment Intents are created via payment endpoints/functions.
+- Stripe webhooks verify payment status and trigger state updates.
+- Crypto payment support is represented by design + contract integration points.
+
+---
+
+## 5) Smart contracts (what each contract is for)
+
+### `AIModelRegistry.sol`
+- Model registry/discovery
+- Creator permissions
+- Model activation/deactivation and metadata references
+
+### `PaymentManager.sol`
+- Payment/subscription state
+- Creator earnings distribution logic
+- Platform fee management
+
+### `ReputationSystem.sol`
+- Reviews/ratings
+- Reputation scoring for creators
+
+### `MarketplaceToken.sol`
+- ERC-20 token implementation (NEXUS)
+- Staking/reward primitives (where supported by the contract design)
+
+---
+
+## 6) Storage & data
+
+### IPFS / Pinata
+- Model artifacts are stored in IPFS with Pinata integration support.
+
+### PostgreSQL
+- Stores user profiles, model metadata, transactions, subscriptions, reviews, usage logs, and audit logs.
+
+---
+
+## 7) Tech stack (current)
+
+- **Frontend**: Next.js App Router, React 18, TypeScript
+- **Styling**: Tailwind CSS, Framer Motion
+- **Web3**: wagmi, Ethers.js, RainbowKit
+- **Backend**: Next.js API Routes (`app/api/**`) + Netlify Functions (`netlify/functions/**`)
+- **DB**: PostgreSQL
+- **Payments**: Stripe (Payment Intents + webhook verification)
+- **Storage**: IPFS/Pinata
+- **Contracts**: Solidity + Hardhat
+
+---
+
+## 8) Security & compliance (architecture-level)
+
+- JWT auth + refresh flow
+- RBAC enforcement (User/Creator/Admin)
+- Rate limiting and input validation
+- Webhook signature verification (Stripe)
+- XSS/CORS/CSP hardening
+
+Full details are in `SECURITY.md`.
+
+---
+
+## 9) Next documentation steps
+
+- For local setup: `GETTING_STARTED.md`
+- For API endpoints: `API.md`
+- For deployment: `DEPLOYMENT.md`
+- For deeper implementation notes/completion: `IMPLEMENTATION_SUMMARY.md`
+
+#  OLD ARCHITECT
+
 # NexusAI - Decentralized AI Marketplace
 
 A futuristic, production-grade decentralized AI marketplace platform built with Next.js, Web3, and blockchain technology.
@@ -229,3 +422,4 @@ MIT License - see LICENSE file for details
 ---
 
 Built with ❤️ for the future of decentralized AI
+
