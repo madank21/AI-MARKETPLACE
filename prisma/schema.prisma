@@ -12,29 +12,188 @@ enum Role {
   ADMIN
 }
 
+enum ModelVisibility {
+  DRAFT
+  PUBLIC
+  PRIVATE
+  ARCHIVED
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum SubscriptionPlan {
+  STARTER
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+  PAST_DUE
+}
+
+enum UsageStatus {
+  SUCCESS
+  FAILED
+}
+
 model User {
-  id            String   @id @default(cuid())
-  username      String   @unique
+  id            String   @id
+  username      String?
   email         String   @unique
-  password      String
   walletAddress String?  @unique
   role          Role     @default(USER)
-
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   models        Model[]
+  transactions  Transaction[]
+  subscriptions Subscription[]
+  reviews       Review[]
+  usageLogs     UsageLog[]
+  auditLogs     AuditLog[]
+
+  @@map("users")
 }
 
 model Model {
-  id            String   @id @default(cuid())
-  title         String
-  description   String
-  price         Float
+  id                String          @id @default(cuid())
+  title             String
+  slug              String          @unique
+  description       String
+  category          String
+  tags              String[]        @default([])
+  version           String          @default("1.0.0")
+  ipfsHash          String?
+  inferenceEndpoint String?
+  thumbnail         String?
+  price             Float
+  currency          String          @default("USD")
+  downloads         Int             @default(0)
+  rating            Float           @default(0)
+  reviewCount       Int             @default(0)
+  visibility        ModelVisibility @default(DRAFT)
+  featured          Boolean         @default(false)
+  deletedAt         DateTime?
+  creatorId         String
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 
-  creatorId     String
-  creator       User @relation(fields: [creatorId], references: [id])
+  creator           User            @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  transactions      Transaction[]
+  subscriptions     Subscription[]
+  reviews           Review[]
+  usageLogs         UsageLog[]
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  @@index([creatorId])
+  @@index([category])
+  @@index([visibility])
+  @@index([featured])
+  @@map("models")
+}
+
+model Transaction {
+  id              String            @id @default(cuid())
+  userId          String
+  modelId         String
+  amount          Float
+  currency        String            @default("USD")
+  status          TransactionStatus @default(PENDING)
+  stripePaymentId String?
+  txHash          String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  model           Model             @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([modelId])
+  @@index([status])
+  @@map("transactions")
+}
+
+model Subscription {
+  id           String             @id @default(cuid())
+  userId       String
+  modelId      String
+  plan         SubscriptionPlan
+  status       SubscriptionStatus @default(ACTIVE)
+  monthlyPrice Float
+  startDate    DateTime           @default(now())
+  endDate      DateTime?
+  autoRenew    Boolean            @default(true)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  model        Model              @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([modelId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  modelId   String
+  rating    Int
+  title     String
+  content   String
+  helpful   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  model     Model    @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, modelId])
+  @@index([modelId])
+  @@map("reviews")
+}
+
+model UsageLog {
+  id         String      @id @default(cuid())
+  userId     String
+  modelId    String
+  tokensUsed Int         @default(0)
+  latency    Int
+  status     UsageStatus
+  metadata   Json?
+  createdAt  DateTime    @default(now())
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  model      Model       @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([modelId])
+  @@index([createdAt])
+  @@map("usage_logs")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  targetId  String?
+  changes   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
 }

@@ -11,8 +11,9 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "test": "jest",
     "test:watch": "jest --watch",
-    "db:migrate": "echo 'Run migrations here'",
-    "db:seed": "echo 'Seed database here'",
+    "db:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate",
+    "db:seed": "prisma db seed",
     "contracts:deploy": "cd contracts && hardhat deploy",
     "contracts:test": "cd contracts && hardhat test",
     "netlify:functions": "netlify functions:serve",
@@ -89,6 +90,9 @@
     "wagmi": "^2.19.5",
     "zod": "^3.24.1",
     "zustand": "^5.0.13"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.0",
