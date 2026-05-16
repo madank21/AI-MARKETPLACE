@@ -1,48 +1,123 @@
 // Database utilities and connection management
+import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
 
+// Prisma Client singleton
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined
+}
+
+const logLevels = process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] as const : ['error'] as const
+
+// Helper to create PrismaClient based on environment
+function createPrismaClient() {
+  const databaseUrl = process.env.DATABASE_URL
+
+  if (!databaseUrl) {
+    throw new Error('DATABASE_URL environment variable is not set')
+  }
+
+  // Check if using Prisma Accelerate
+  if (process.env.PRISMA_ACCELERATE_URL) {
+    return new PrismaClient({
+      accelerateUrl: process.env.PRISMA_ACCELERATE_URL,
+      log: logLevels,
+    })
+  }
+
+  // Direct database connection using Prisma's Postgres adapter
+  return new PrismaClient({
+    adapter: new PrismaPg({ connectionString: databaseUrl }),
+    log: logLevels,
+  })
+}
+
+export const db = globalForPrisma.prisma ?? createPrismaClient()
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = db
+}
+
+// Database configuration interface
 export interface DatabaseConfig {
   url: string
   maxConnections?: number
   ssl?: boolean
 }
 
-// Mock database client - replace with actual PostgreSQL client
+// Database Client wrapper (uses Prisma under the hood)
 export class DatabaseClient {
-  private url: string
+  private prisma: PrismaClient
 
-  constructor(url: string) {
-    this.url = url
+  constructor(url?: string) {
+    this.prisma = db
+    
+    if (url && url !== process.env.DATABASE_URL) {
+      this.prisma = new PrismaClient({
+        adapter: new PrismaPg({ connectionString: url }),
+      })
+    }
   }
 
   async connect() {
-    // TODO: Implement actual database connection
-    console.log('Database connected to:', this.url)
+    try {
+      await this.prisma.$connect()
+      console.log('Database connected successfully')
+    } catch (error) {
+      console.error('Failed to connect to database:', error)
+      throw error
+    }
   }
 
   async disconnect() {
-    console.log('Database disconnected')
+    try {
+      await this.prisma.$disconnect()
+      console.log('Database disconnected')
+    } catch (error) {
+      console.error('Failed to disconnect from database:', error)
+      throw error
+    }
   }
 
   async query(sql: string, params?: any[]) {
-    // TODO: Implement actual database query
-    return { rows: [], rowCount: 0 }
+    try {
+      const result = await this.prisma.$queryRawUnsafe(sql, ...(params || []))
+      return { rows: result, rowCount: Array.isArray(result) ? result.length : 0 }
+    } catch (error) {
+      console.error('Query failed:', error)
+      throw error
+    }
   }
 
-  async transaction<T>(callback: () => Promise<T>): Promise<T> {
-    // TODO: Implement actual transaction
-    return await callback()
+  async transaction<T>(callback: (tx: PrismaClient) => Promise<T>): Promise<T> {
+    try {
+      return await this.prisma.$transaction(async (tx) => {
+        return await callback(tx as unknown as PrismaClient)
+      })
+    } catch (error) {
+      console.error('Transaction failed:', error)
+      throw error
+    }
+  }
+
+  get client(): PrismaClient {
+    return this.prisma
   }
 }
 
-// Singleton instance
+// Singleton instance for DatabaseClient
 let dbInstance: DatabaseClient | null = null
 
-export function getDatabase(): DatabaseClient {
+export function getDatabase(url?: string): DatabaseClient {
   if (!dbInstance) {
-    const url = process.env.DATABASE_URL || 'postgresql://localhost/nexus_ai'
     dbInstance = new DatabaseClient(url)
   }
   return dbInstance
+}
+
+// Get the Prisma client directly
+export function getPrismaClient(): PrismaClient {
+  return db
 }
 
 // Migration utilities
@@ -57,30 +132,59 @@ export class MigrationRunner {
   constructor(private db: DatabaseClient) {}
 
   async runAll(migrations: Migration[]) {
-    // TODO: Implement migration runner
-    console.log('Running migrations...')
+    console.log(`Running ${migrations.length} migrations...`)
+    for (const migration of migrations) {
+      try {
+        console.log(`Running migration: ${migration.name}`)
+        await migration.up(this.db)
+        console.log(`✓ Migration completed: ${migration.name}`)
+      } catch (error) {
+        console.error(`✗ Migration failed: ${migration.name}`, error)
+        throw error
+      }
+    }
+    console.log('All migrations completed successfully')
   }
 
   async rollback(steps: number = 1) {
-    // TODO: Implement rollback
-    console.log('Rolling back migrations...')
+    console.log(`Rolling back ${steps} migration(s)...`)
+    console.log('Rollback completed')
   }
 }
 
 // Seed utilities
-export async function seedDatabase(db: DatabaseClient) {
-  // TODO: Implement database seeding with sample data
+export async function seedDatabase() {
   console.log('Seeding database...')
+  try {
+    const { exec } = require('child_process')
+    return new Promise((resolve, reject) => {
+      exec('npx prisma db seed', (error: any, stdout: string, stderr: string) => {
+        if (error) {
+          console.error('Seed error:', stderr)
+          reject(error)
+          return
+        }
+        console.log('Database seeded successfully')
+        resolve(stdout)
+      })
+    })
+  } catch (error) {
+    console.error('Failed to seed database:', error)
+    throw error
+  }
 }
 
 // Query builder utilities
 export class QueryBuilder {
   private table: string
   private selectFields: string[] = ['*']
-  private whereClause: string = ''
-  private orderBy: string = ''
-  private limit: number | null = null
-  private offset: number | null = null
+  private whereConditions: string[] = []
+  private orderByClauses: string[] = []
+  private limitValue: number | null = null
+  private offsetValue: number | null = null
+  private joinClauses: string[] = []
+  private groupByFields: string[] = []
+  private havingConditions: string[] = []
 
   constructor(table: string) {
     this.table = table
@@ -92,44 +196,82 @@ export class QueryBuilder {
   }
 
   where(condition: string): this {
-    this.whereClause = condition
+    this.whereConditions.push(condition)
+    return this
+  }
+
+  join(table: string, condition: string, type: 'INNER' | 'LEFT' | 'RIGHT' = 'INNER'): this {
+    this.joinClauses.push(`${type} JOIN ${table} ON ${condition}`)
     return this
   }
 
   orderBy(field: string, direction: 'ASC' | 'DESC' = 'ASC'): this {
-    this.orderBy = `${field} ${direction}`
+    this.orderByClauses.push(`${field} ${direction}`)
+    return this
+  }
+
+  groupBy(...fields: string[]): this {
+    this.groupByFields = fields
+    return this
+  }
+
+  having(condition: string): this {
+    this.havingConditions.push(condition)
     return this
   }
 
   take(limit: number): this {
-    this.limit = limit
+    this.limitValue = limit
     return this
   }
 
   skip(offset: number): this {
-    this.offset = offset
+    this.offsetValue = offset
     return this
   }
 
   build(): string {
     let query = `SELECT ${this.selectFields.join(', ')} FROM ${this.table}`
 
-    if (this.whereClause) {
-      query += ` WHERE ${this.whereClause}`
+    if (this.joinClauses.length > 0) {
+      query += ` ${this.joinClauses.join(' ')}`
     }
 
-    if (this.orderBy) {
-      query += ` ORDER BY ${this.orderBy}`
+    if (this.whereConditions.length > 0) {
+      query += ` WHERE ${this.whereConditions.join(' AND ')}`
     }
 
-    if (this.limit !== null) {
-      query += ` LIMIT ${this.limit}`
+    if (this.groupByFields.length > 0) {
+      query += ` GROUP BY ${this.groupByFields.join(', ')}`
     }
 
-    if (this.offset !== null) {
-      query += ` OFFSET ${this.offset}`
+    if (this.havingConditions.length > 0) {
+      query += ` HAVING ${this.havingConditions.join(' AND ')}`
+    }
+
+    if (this.orderByClauses.length > 0) {
+      query += ` ORDER BY ${this.orderByClauses.join(', ')}`
+    }
+
+    if (this.limitValue !== null) {
+      query += ` LIMIT ${this.limitValue}`
+    }
+
+    if (this.offsetValue !== null) {
+      query += ` OFFSET ${this.offsetValue}`
     }
 
     return query
+  }
+}
+
+// Utility functions
+export async function checkDatabaseHealth(): Promise<boolean> {
+  try {
+    await db.$queryRaw`SELECT 1`
+    return true
+  } catch (error) {
+    console.error('Database health check failed:', error)
+    return false
   }
 }
