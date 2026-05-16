@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Upload, File, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import {Navbar } from '@/components/ui/navbar'
+
 
 export default function ModelUploadPage() {
   const [formData, setFormData] = useState({
@@ -79,6 +81,7 @@ export default function ModelUploadPage() {
 
   return (
     <div className="space-y-8">
+      <Navbar />
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

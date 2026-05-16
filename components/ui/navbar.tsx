@@ -30,11 +30,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './dropdown-menu'
+import { AISearch } from './ai-search'
+import { NotificationsPanel } from './notifications-panel'
 
 const navItems = [
   { href: '/marketplace', label: 'Marketplace', icon: Store },
   { href: '/explore', label: 'Explore', icon: Search },
-  { href: '/creator/upload', label: 'Creators', icon: Users },
+  { href: '/creator', label: 'Creators', icon: Users },
   { href: '/docs', label: 'Docs', icon: BookOpen },
 ]
 
@@ -42,7 +44,8 @@ export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
-
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20)
@@ -97,21 +100,21 @@ export function Navbar() {
             <div className="flex items-center gap-2 lg:gap-3">
               {/* Search */}
               <Button
-                variant="ghost"
                 size="icon"
-                className="text-muted-foreground hover:text-foreground hover:bg-muted/50 w-11 h-11"
-              >
+                  variant="ghost"
+                   onClick={() => setSearchOpen(true)}
+                    className="relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl hover:bg-cyan-500/10 hover:border-cyan-400/40"
+                      >
                 <Search className="w-5 h-5" />
               </Button>
-
               {/* Notifications */}
               <Button
-                variant="ghost"
                 size="icon"
-                className="relative text-muted-foreground hover:text-foreground hover:bg-muted/50 w-11 h-11"
-              >
-                <Bell className="w-5 h-5" />
-                <motion.span 
+                variant="ghost"
+                onClick={() => setNotificationsOpen(true)}
+                className="relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl hover:bg-purple-500/10 hover:border-purple-400/40"
+                    >
+                      <motion.span 
                   className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-red-500 to-pink-500 text-xs rounded-full flex items-center justify-center text-white font-bold shadow-lg border-2 border-background"
                   layoutId="notification"
                   animate={{ scale: [1, 1.05, 1] }}
@@ -119,7 +122,10 @@ export function Navbar() {
                 >
                   3
                 </motion.span>
-              </Button>
+ 
+                <Bell className="w-5 h-5" />
+                
+                </Button>
 
               {/* Connect Wallet / User Profile 👇 ROBOHASH HERE */}
               <div className="hidden sm:block">
@@ -359,6 +365,16 @@ export function Navbar() {
 
       {/* Spacer */}
       <div className="h-16 lg:h-20" />
+
+      <AISearch
+      open={searchOpen}
+      onClose={() => setSearchOpen(false)}
+    />
+
+    <NotificationsPanel
+      open={notificationsOpen}
+      onClose={() => setNotificationsOpen(false)}
+    />
     </>
   )
 }
