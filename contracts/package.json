@@ -1,0 +1,24 @@
+{
+  "name": "ai-marketplace-contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy": "hardhat run scripts/deploy.ts --network sepolia",
+    "test": "hardhat test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.5",
+    "ethers": "^6.16.0",
+    "@openzeppelin/contracts": "^5.0.2"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "hardhat": "^2.22.11",
+    "typescript": "^5.7.3"
+  }
+}
+

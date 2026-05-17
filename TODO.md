@@ -1,7 +1,35 @@
-# TODO
+# TODO.md
 
-- [ ] Consolidate documentation sources (ARCHITECTURE.md, API.md, GETTING_STARTED.md, DEPLOYMENT.md, plus existing README.md) and design the new README structure.
-- [ ] Update `README.md` with a complete detailed overview combining all gathered content while keeping deep dives in linked docs.
-- [ ] Verify README markdown is coherent (no broken links to files that don’t exist).
-- [ ] (Optional) Run `pnpm lint` and/or `pnpm type-check` if available to ensure no tooling errors (README-only change shouldn’t affect build).
+## Phase 4 — Smart Contracts + Web3 Infrastructure
+
+### Step 0 — Repo analysis (done)
+- Reviewed existing Solidity contracts under `contracts/`.
+- Reviewed frontend Web3 scaffolding (`components/providers.tsx`, `lib/web3-utils.ts`).
+
+### Step 1 — Create Hardhat workspace inside `/contracts` (pending)
+- Create `/contracts/package.json`, `hardhat.config.ts`, `/contracts/.env` guidance.
+- Add Hardhat+tooling deps and scripts folder.
+
+### Step 2 — Relocate Solidity contracts into Hardhat convention
+- Move/copy existing contracts into `/contracts/contracts/*.sol`.
+
+### Step 3 — Align Solidity contracts with intended interfaces
+- Add missing functions/events required by frontend.
+- Align function signatures with ABIs.
+
+### Step 4 — Fix frontend ABI usage
+- Replace mock ABIs in `lib/web3-utils.ts` with real compiled ABI imports from artifacts.
+- Align address/export config (`NEXT_PUBLIC_*_ADDRESS`).
+
+### Step 5 — Add deploy script + frontend export
+- Implement `contracts/scripts/deploy.ts`.
+- Add helper to write deployed addresses for frontend.
+
+### Step 6 — Compile & smoke test
+- Run `npx hardhat compile`.
+- Ensure artifacts exist and ABI imports work.
+
+### Step 7 — Deploy to Sepolia
+- Run deploy to Sepolia.
+- Verify deployed addresses output.
 
