@@ -7,7 +7,8 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-const logLevels = process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] as const : ['error'] as const
+const logLevels: ('query' | 'error' | 'warn')[] =
+  process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error']
 
 // Helper to create PrismaClient based on environment
 function createPrismaClient() {

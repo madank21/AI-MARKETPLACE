@@ -39,9 +39,8 @@ export function getTimeAgo(date: Date): string {
 
 export async function fetchWithAuth(url: string, options: RequestInit = {}) {
   const token = localStorage.getItem('authToken')
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...options.headers,
   }
 
   if (token) {
@@ -50,7 +49,10 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
 
   const response = await fetch(url, {
     ...options,
-    headers,
+    headers: {
+      ...headers,
+      ...options.headers,
+    },
   })
 
   if (!response.ok) {

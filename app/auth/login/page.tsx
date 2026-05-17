@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Navbar } from '@/components/ui/navbar'
@@ -17,11 +17,21 @@ export default function LoginPage() {
   const { isSignedIn } = useAuth()
   const router = useRouter()
 
-  // Redirect if already signed in
-  if (isSignedIn) {
-    router.push('/dashboard')
-    return null
-  }
+  useEffect(() => {
+    if (!isSignedIn) return
+
+    async function syncUser() {
+      try {
+        await fetch('/api/users/sync', { method: 'POST' })
+      } finally {
+        router.push('/dashboard')
+      }
+    }
+
+    syncUser()
+  }, [isSignedIn, router])
+
+  if (isSignedIn) return null
 
   const handleMethodSwitch = (method: 'wallet' | 'email') => {
     setAuthMethod(method)

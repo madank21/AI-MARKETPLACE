@@ -39,6 +39,7 @@ export default function SignupPage() {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500))
+      await fetch('/api/users/sync', { method: 'POST' })
       toast.success('Account created successfully!')
       window.location.href = '/dashboard'
     } catch (error) {
@@ -57,6 +58,7 @@ export default function SignupPage() {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500))
+      await fetch('/api/users/sync', { method: 'POST' })
       toast.success('Account created with wallet!')
       window.location.href = '/dashboard'
     } catch (error) {

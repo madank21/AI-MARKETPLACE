@@ -1,41 +1,136 @@
 import { NextResponse } from 'next/server'
+import { db } from '@/lib/database'
+import { getAuthErrorResponse, requireCreator } from '@/lib/auth'
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const { id } = params
+type RouteContext = {
+  params: Promise<{ id: string }>
+}
 
-    // TODO: Get model details from database
-    const model = {
+export async function GET(_request: Request, context: RouteContext) {
+  const { id } = await context.params
+
+  const model = await db.model.findFirst({
+    where: {
       id,
-      name: 'GPT-Vision Clone',
-      creator: 'AI Labs',
-      description: 'Advanced vision and language model',
-      category: 'Language Model',
-      rating: 4.8,
-      downloads: 2400,
-      price: 0.05,
-      image: '/models/gpt-vision.png',
-      version: '2.0',
-      createdAt: '2024-01-15',
-      documentation: 'https://docs.example.com',
-      metrics: {
-        latency: '124ms',
-        throughput: '1000 req/s',
-        accuracy: 0.95,
+      deletedAt: null,
+    },
+    include: {
+      creator: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          walletAddress: true,
+        },
       },
+      reviews: {
+        take: 10,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+            },
+          },
+        },
+      },
+    },
+  })
+
+  if (!model) {
+    return NextResponse.json({ error: 'Model not found' }, { status: 404 })
+  }
+
+  return NextResponse.json({ success: true, model })
+}
+
+export async function PATCH(request: Request, context: RouteContext) {
+  try {
+    const creator = await requireCreator()
+    const { id } = await context.params
+    const body = await request.json()
+
+    const existing = await db.model.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        creatorId: true,
+      },
+    })
+
+    if (!existing || existing.creatorId !== creator.id) {
+      return NextResponse.json({ error: 'Model not found' }, { status: 404 })
     }
 
-    return NextResponse.json(
-      { success: true, model },
-      { status: 200 }
-    )
+    const model = await db.model.update({
+      where: { id },
+      data: {
+        title: body.title,
+        description: body.description,
+        category: body.category,
+        tags: Array.isArray(body.tags) ? body.tags : undefined,
+        version: body.version,
+        ipfsHash: body.ipfsHash,
+        inferenceEndpoint: body.inferenceEndpoint,
+        thumbnail: body.thumbnail,
+        price: body.price === undefined ? undefined : Number(body.price),
+        currency: body.currency,
+        visibility: body.visibility,
+        featured: body.featured,
+      },
+    })
+
+    await db.auditLog.create({
+      data: {
+        userId: creator.id,
+        action: 'MODEL_UPDATED',
+        targetId: model.id,
+        changes: body,
+      },
+    })
+
+    return NextResponse.json(model)
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Model not found' },
-      { status: 404 }
-    )
+    return getAuthErrorResponse(error)
+  }
+}
+
+export async function DELETE(_request: Request, context: RouteContext) {
+  try {
+    const creator = await requireCreator()
+    const { id } = await context.params
+
+    const existing = await db.model.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        creatorId: true,
+      },
+    })
+
+    if (!existing || existing.creatorId !== creator.id) {
+      return NextResponse.json({ error: 'Model not found' }, { status: 404 })
+    }
+
+    const model = await db.model.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+        visibility: 'ARCHIVED',
+      },
+    })
+
+    await db.auditLog.create({
+      data: {
+        userId: creator.id,
+        action: 'MODEL_DELETED',
+        targetId: model.id,
+      },
+    })
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    return getAuthErrorResponse(error)
   }
 }
