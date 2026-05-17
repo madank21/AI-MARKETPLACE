@@ -7,9 +7,6 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-const logLevels: ('query' | 'error' | 'warn')[] =
-  process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error']
-
 // Helper to create PrismaClient based on environment
 function createPrismaClient() {
   const databaseUrl = process.env.DATABASE_URL
@@ -18,18 +15,8 @@ function createPrismaClient() {
     throw new Error('DATABASE_URL environment variable is not set')
   }
 
-  // Check if using Prisma Accelerate
-  if (process.env.PRISMA_ACCELERATE_URL) {
-    return new PrismaClient({
-      accelerateUrl: process.env.PRISMA_ACCELERATE_URL,
-      log: logLevels,
-    })
-  }
-
-  // Direct database connection using Prisma's Postgres adapter
   return new PrismaClient({
-    adapter: new PrismaPg({ connectionString: databaseUrl }),
-    log: logLevels,
+    adapter: new PrismaPg(databaseUrl),
   })
 }
 
@@ -51,13 +38,9 @@ export class DatabaseClient {
   private prisma: PrismaClient
 
   constructor(url?: string) {
-    this.prisma = db
-    
-    if (url && url !== process.env.DATABASE_URL) {
-      this.prisma = new PrismaClient({
-        adapter: new PrismaPg({ connectionString: url }),
-      })
-    }
+    this.prisma = url && url !== process.env.DATABASE_URL
+      ? new PrismaClient({ adapter: new PrismaPg(url) })
+      : db
   }
 
   async connect() {

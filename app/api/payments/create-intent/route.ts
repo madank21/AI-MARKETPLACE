@@ -1,8 +1,17 @@
 import { NextResponse } from 'next/server'
+import { getAuthErrorResponse, requireUser } from '@/lib/auth'
 
 export async function POST(request: Request) {
   try {
+    await requireUser()
     const { amount, currency, description } = await request.json()
+
+    if (!amount || Number(amount) <= 0) {
+      return NextResponse.json(
+        { error: 'A positive amount is required' },
+        { status: 400 }
+      )
+    }
 
     // TODO: Implement Stripe payment intent creation
     // This would:
@@ -23,9 +32,6 @@ export async function POST(request: Request) {
       { status: 200 }
     )
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Payment initialization failed' },
-      { status: 500 }
-    )
+    return getAuthErrorResponse(error)
   }
 }

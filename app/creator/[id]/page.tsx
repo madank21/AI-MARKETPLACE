@@ -2,8 +2,13 @@
 import { RobohashAvatar } from '@/components/ui/robohash-avatar'
 import { mockCreators } from '@/lib/mock-data'
 
-export default function CreatorProfile({ params }: { params: { id: string } }) {
-  const creator = mockCreators.find(c => c.id === params.id)
+type CreatorProfileProps = {
+  params: Promise<{ id: string }>
+}
+
+export default async function CreatorProfile({ params }: CreatorProfileProps) {
+  const { id } = await params
+  const creator = mockCreators.find((creator) => creator.id === id)
   
   return (
     <div className="max-w-4xl mx-auto p-8">

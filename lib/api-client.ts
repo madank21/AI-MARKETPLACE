@@ -37,14 +37,9 @@ export function getTimeAgo(date: Date): string {
   }).format(date)
 }
 
-export async function fetchWithAuth(url: string, options: RequestInit = {}) {
-  const token = localStorage.getItem('authToken')
+export async function fetchJson(url: string, options: RequestInit = {}) {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-  }
-
-  if (token) {
-    headers.Authorization = `Bearer ${token}`
   }
 
   const response = await fetch(url, {
@@ -71,34 +66,6 @@ export function validateEmail(email: string): boolean {
   return emailRegex.test(email)
 }
 
-export function validatePassword(password: string): {
-  isValid: boolean
-  errors: string[]
-} {
-  const errors = []
-
-  if (password.length < 8) {
-    errors.push('Password must be at least 8 characters')
-  }
-  if (!/[A-Z]/.test(password)) {
-    errors.push('Password must contain an uppercase letter')
-  }
-  if (!/[a-z]/.test(password)) {
-    errors.push('Password must contain a lowercase letter')
-  }
-  if (!/[0-9]/.test(password)) {
-    errors.push('Password must contain a number')
-  }
-  if (!/[^A-Za-z0-9]/.test(password)) {
-    errors.push('Password must contain a special character')
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-  }
-}
-
 export function truncateText(text: string, length: number = 100): string {
   if (text.length <= length) return text
   return text.substring(0, length) + '...'
@@ -110,25 +77,6 @@ export function slugify(text: string): string {
     .replace(/[^\w\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/^-+|-+$/g, '')
-}
-
-export function parseCookie(name: string): string | null {
-  const nameEQ = name + '='
-  const cookies = document.cookie.split(';')
-  for (let cookie of cookies) {
-    cookie = cookie.trim()
-    if (cookie.indexOf(nameEQ) === 0) {
-      return cookie.substring(nameEQ.length)
-    }
-  }
-  return null
-}
-
-export function setCookie(name: string, value: string, days: number = 7) {
-  const d = new Date()
-  d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000)
-  const expires = 'expires=' + d.toUTCString()
-  document.cookie = name + '=' + value + '; ' + expires + '; path=/'
 }
 
 export function isMobile(): boolean {
