@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { Providers } from '@/components/providers'
 import './globals.css'
 import { ClerkProvider } from '@clerk/nextjs'
+import { StripeProvider } from '@/components/providers/stripe-provider'
 
 
 const inter = Inter({ 
@@ -48,9 +49,11 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} dark bg-background`}>
         <body className="font-sans antialiased min-h-screen bg-background text-foreground">
-          <Providers>
-            {children}
-          </Providers>
+          <StripeProvider>
+            <Providers>
+              {children}
+            </Providers>
+          </StripeProvider>
           {process.env.NODE_ENV === 'production' && <Analytics />}
         </body>
       </html>
