@@ -3,10 +3,9 @@ import Stripe from 'stripe'
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY
 
 if (!stripeSecretKey) {
-  throw new Error('STRIPE_SECRET_KEY environment variable is not set')
+  throw new Error('Missing STRIPE_SECRET_KEY')
 }
 
 export const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: '2025-04-30.basil' as any,
-  typescript: true,
+  apiVersion: '2024-06-20',
 })
